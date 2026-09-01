@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="pagEntrada.css?v=4.0">
+    <title>Página de Entrada</title>
+    <style>
+        .boneco-area {
+            position: relative;
+            display: inline-block;
+            overflow: visible;
+            background: transparent !important;
+        }
+        #video-fundo-home {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: calc(100% + 40px);
+            height: calc(100% + 40px);
+            object-fit: cover;
+            z-index: 1;
+            pointer-events: none;
+            border-radius: 12px;
+            background: transparent !important;
+        }
+        #boneco-principal {
+            position: relative;
+            z-index: 2;
+            overflow: visible;
+            background-color: transparent !important;
+        }
+        #bloco-criar-personagem, #bloco-layout-centro {
+            display: none;
+        }
+
+        .barra-xp-fill {
+            height: 100%;
+            background-color: #ff9800 !important;
+            transition: width 0.4s ease-in-out;
+            border-radius: 8px;
+        }
+
+        .xp-numeros {
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="pagina-entrada.html" id="inicio">INÍCIO</a>
+        <a href="" id="config">CONFIGURAÇÃO</a>
+        
+        <img src="foto-logo.png" alt="Logo" class="logo-img">
+        
+        <a href="sobre-nos.html" id="sobre">SOBRE NÓS</a>
+        <a href="suporte.html" id="suporte">SUPORTE</a>
+
+        <a href="perfil.html">
+            <div class="avatar-container">
+                <img src="perfil.png" id="perfil" alt="Perfil">
+            </div>
+        </a>
+    </header>
+
+    <div class="container-entrada" id="container-entrada">
+        <div id="bloco-criar-personagem">
+            <p id="criar-p">CRIE SEU PERSONAGEM</p>
+            <a href="criar.html">
+                <img src="perso-btn.png" alt="Criar Personagem">
+            </a>
+        </div>
+
+        <div id="bloco-layout-centro" class="layout-centro">
+            <div class="boneco-area" id="boneco-container">
+                <svg id="boneco-principal" width="300" height="420" viewBox="0 0 200 280">
+                    <defs>
+                        <clipPath id="recorte-corpo-home">
+                            <path d="
+                            M 100,60 
+                            C 75,60 62,72 44,100 
+                            C 35,114 47,128 55,115 
+                            C 65,99 71,90 76,94 
+                            C 73,115 67,155 62,215 
+                            C 60,228 76,228 78,215 
+                            C 84,175 92,142 100,142 
+                            C 108,142 116,175 122,215 
+                            C 124,228 140,228 138,215 
+                            C 133,155 127,115 124,94 
+                            C 129,90 135,99 145,115 
+                            C 153,128 165,114 156,100 
+                            C 138,72 125,60 100,60 Z" />
+                        </clipPath>
+                    </defs>
+
+                    <g id="elementos-fundo-svg"></g>
+
+                    <circle id="cabeca-boneco" cx="100" cy="40" r="18" fill="#4a7bc7" />
+                    <path id="corpo-boneco" d="
+                    M 100,60 
+                    C 75,60 62,72 44,100 
+                    C 35,114 47,128 55,115 
+                    C 65,99 71,90 76,94 
+                    C 73,115 67,155 62,215 
+                    C 60,228 76,228 78,215 
+                    C 84,175 92,142 100,142 
+                    C 108,142 116,175 122,215 
+                    C 124,228 140,228 138,215 
+                    C 133,155 127,115 124,94 
+                    C 129,90 135,99 145,115 
+                    C 153,128 165,114 156,100 
+                    C 138,72 125,60 100,60 Z" fill="#4a7bc7" />
+
+                    <g clip-path="url(#recorte-corpo-home)" id="grupo-estampas"></g>
+
+                    <image id="img-roupa" x="33" y="35" width="140" height="170" href="" />
+                    <image id="img-chapeu" x="70" y="2" width="60" height="46" href="" />
+                </svg>
+                <div class="sombra"></div>
+            </div>
+
+            <div class="card-usuario-foto">
+                <div class="topo-perfil-card">
+                    <div class="foto-perfil-circulo">
+                        <img src="perfil.png" alt="Foto">
+                    </div>
+                    <div class="dados-texto">
+                        <h2 class="nome-usuario-foto" id="txt-nome">Carregando...</h2>
+                        <span class="level-texto" id="txt-level">Level 0</span>
+                        <div class="barra-xp-container">
+                            <div class="barra-xp-fill" id="barra-xp" style="width: 0%;"></div>
+                        </div>
+                        <span class="xp-numeros" id="txt-xp">0 / 100 XP</span>
+                    </div>
+                </div>
+
+                <div class="secao-insignias">
+                    <h3>Insígnias</h3>
+                    <div class="container-icones-insignia" id="container-insignias"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="botoes">
+        <a href="tutoriais.html" id="tutoriais">Tutoriais</a>
+        <a href="forum.html" id="forum">Fórum</a>
+        <a href="" id="banco">Banco</a>
+        <a href="" id="gestao">Gestão</a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4c2ZwbXF3aHB2YWp6eXJhcHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4OTU0MDAsImV4cCI6MjEwMzQ3MTQwMH0.qNgFa9lbwdqEjVFM2Su4yHchR_vtl7w9QOOrPYe1wsA";
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const caminhoRoupas = { 'nenhuma': '', 'camiseta': 'camisa.png', 'jaqueta': 'img/roupas/jaqueta.png' };
+        const caminhoChapeus = { 'nenhum': '', 'bone': 'chapeu.png', 'festa': 'img/chapeus/chapeu-festa.png' };
+        const caminhoAuras = { 'nenhuma': '', 'fogo': 'animacao.gif', 'brilho': 'img/auras/aura-brilho.gif' };
+
+        const emailUsuario = localStorage.getItem('usuario_email') || "";
+
+        if (!emailUsuario) {
+            window.location.href = "login.html";
+        }
+
+        async function buscarEAtualizarDados() {
+            try {
+                const { data: usuarios, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('nome, nome_personagem, level, xp, personagem_criado, cor_1, cor_2, estampa, roupa, chapeu, animacao_fundo')
+                    .eq('email', emailUsuario);
+
+                if (error) throw error;
+
+                if (usuarios && usuarios.length > 0) {
+                    const userData = usuarios[0];
+
+                    const nome = userData.nome_personagem || userData.nome || 'Usuário';
+                    
+                    const xpBruto = Number(userData.xp);
+                    const xp = isNaN(xpBruto) ? 0 : xpBruto;
+
+                    const levelCalculado = Math.floor(xp / 100);
+
+                    const foiCriado = userData.personagem_criado == 1 || userData.personagem_criado === true;
+
+                    if (!foiCriado) {
+                        document.getElementById('bloco-criar-personagem').style.display = 'block';
+                        document.getElementById('bloco-layout-centro').style.display = 'none';
+                        return; 
+                    } else {
+                        document.getElementById('bloco-criar-personagem').style.display = 'none';
+                        document.getElementById('bloco-layout-centro').style.display = 'flex';
+                    }
+
+                    const cor1 = userData.cor_1 || '#4a7bc7';
+                    const cor2 = userData.cor_2 || '#ff0000';
+                    const estampa = userData.estampa || 'nenhuma';
+                    const roupa = userData.roupa || 'nenhuma';
+                    const chapeu = userData.chapeu || 'nenhum';
+                    const animacao = userData.animacao_fundo || 'nenhuma';
+
+                    let xpProgresso = xp % 100;
+
+                    document.getElementById('txt-nome').textContent = nome;
+                    document.getElementById('txt-level').textContent = `Level ${levelCalculado}`;
+                    
+                    const elBarra = document.getElementById('barra-xp');
+                    if (elBarra) {
+                        elBarra.style.width = `${xpProgresso}%`;
+                    }
+                    
+                    document.getElementById('txt-xp').textContent = `${xpProgresso} / 100 XP`;
+
+                    const containerInsignias = document.getElementById('container-insignias');
+                    containerInsignias.innerHTML = '';
+
+                    const regrasInsignias = [
+                        { min: 100, classe: 'insignia-verde-icon', nome: 'Mestre Nível 100' },
+                        { min: 200, classe: 'insignia-laranja-icon', nome: 'Mestre Nível 200' },
+                        { min: 300, classe: 'insignia-azul-icon', nome: 'Lenda Nível 300' }
+                    ];
+
+                    let temInsignia = false;
+                    regrasInsignias.forEach(regra => {
+                        if (levelCalculado >= regra.min) {
+                            temInsignia = true;
+                            const divInsignia = document.createElement('div');
+                            divInsignia.className = `circulo-insignia ${regra.classe}`;
+                            divInsignia.title = regra.nome;
+                            containerInsignias.appendChild(divInsignia);
+                        }
+                    });
+
+                    if (!temInsignia) {
+                        containerInsignias.innerHTML = '<p class="sem-insignia">Disponível a partir do Nível 100.</p>';
+                    }
+
+                    document.getElementById('cabeca-boneco').setAttribute('fill', cor1);
+                    document.getElementById('corpo-boneco').setAttribute('fill', cor1);
+
+                    const grupoEstampas = document.getElementById('grupo-estampas');
+                    grupoEstampas.innerHTML = '';
+                    if (estampa === 'bolinhas') {
+                        grupoEstampas.innerHTML = `
+                            <circle cx="80" cy="90" r="8" fill="${cor2}" />
+                            <circle cx="120" cy="110" r="12" fill="${cor2}" />
+                            <circle cx="95" cy="140" r="10" fill="${cor2}" />
+                            <circle cx="110" cy="180" r="9" fill="${cor2}" />
+                        `;
+                    } else if (estampa === 'linhas') {
+                        let linhasHTML = '';
+                        for (let offset = -250; offset < 400; offset += 16) {
+                            linhasHTML += `<line x1="${offset + 250}" y1="0" x2="${offset}" y2="280" stroke="${cor2}" stroke-width="5" />`;
+                        }
+                        grupoEstampas.innerHTML = linhasHTML;
+                    }
+
+                    document.getElementById('img-roupa').setAttribute('href', caminhoRoupas[roupa] || '');
+                    document.getElementById('img-chapeu').setAttribute('href', caminhoChapeus[chapeu] || '');
+
+                    const auraSrc = caminhoAuras[animacao] || '';
+                    const bonecoContainer = document.getElementById('boneco-container');
+                    const elFundoSvg = document.getElementById('elementos-fundo-svg');
+                    
+                    const videoAntigo = document.getElementById('video-fundo-home');
+                    if (videoAntigo) videoAntigo.remove();
+                    elFundoSvg.innerHTML = '';
+
+                    if (auraSrc) {
+                        if (auraSrc.endsWith('.mp4')) {
+                            const videoHTML = `<video id="video-fundo-home" autoplay loop muted playsinline src="${auraSrc}"></video>`;
+                            bonecoContainer.insertAdjacentHTML('afterbegin', videoHTML);
+                        } else {
+                            elFundoSvg.innerHTML = `<image id="img-animacao" x="-20" y="-20" width="240" height="320" href="${auraSrc}" preserveAspectRatio="none" />`;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Erro ao carregar dados no Supabase:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            buscarEAtualizarDados();
+
+            supabaseClient
+                .channel('mudancas-usuarios')
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'usuarios',
+                    filter: `email=eq.${emailUsuario}`
+                }, () => {
+                    buscarEAtualizarDados();
+                })
+                .subscribe();
+        });
+
+        window.addEventListener('pageshow', () => {
+            buscarEAtualizarDados();
+        });
+
+        window.addEventListener('focus', () => {
+            buscarEAtualizarDados();
+        });
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'usuario_xp_atualizado') {
+                buscarEAtualizarDados();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fórum</title>
+    <link rel="stylesheet" href="forum.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    
+    <header>
+        <div class="volta-dois">
+            <a href="" onclick="history.back(); return false;">
+                <img src="voltar-bt.png" id="voltar" alt="Voltar">
+            </a>
+            <img src="tres-pontos-azul-btn.png" id="tres-pontos" alt="Opções">
+        </div>
+        <img src="foto-logo.png" alt="">
+    </header>
+
+    <div class="container-entrada">
+        <h2>Fórum da Comunidade</h2>
+
+        <form id="form-post" class="form-post">
+            <textarea id="mensagem" name="mensagem" placeholder="Escreva sua mensagem aqui..." required class="input-mensagem"></textarea>
+            <br><br>
+            <button type="submit" id="btn-publicar" class="btn-publicar">Publicar</button>
+        </form>
+
+        <hr class="divisor">
+
+        <div id="lista-posts" class="lista-posts">
+            <p>Carregando publicações...</p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4c2ZwbXF3aHB2YWp6eXJhcHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4OTU0MDAsImV4cCI6MjEwMzQ3MTQwMH0.qNgFa9lbwdqEjVFM2Su4yHchR_vtl7w9QOOrPYe1wsA";
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let usuarioAtual = null;
+
+        // Formatação de data simples
+        function formatarData(dataIso) {
+            if (!dataIso) return '';
+            const data = new Date(dataIso);
+            return data.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Função para carregar publicações
+        async function carregarPosts() {
+            const listaContainer = document.getElementById('lista-posts');
+
+            // Busca posts ordenados por data
+            const { data: posts, error: errorPosts } = await supabaseClient
+                .from('posts')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (errorPosts) {
+                console.error("Erro ao carregar posts:", errorPosts);
+                listaContainer.innerHTML = "<p>Erro ao carregar os posts.</p>";
+                return;
+            }
+
+            if (!posts || posts.length === 0) {
+                listaContainer.innerHTML = "<p>Nenhum comentário enviado ainda.</p>";
+                return;
+            }
+
+            // Busca usuários para mapear os níveis pelo nome/email
+            const { data: usuarios } = await supabaseClient
+                .from('usuarios')
+                .select('nome, level, email');
+
+            const mapaNiveis = {};
+            if (usuarios) {
+                usuarios.forEach(u => {
+                    if (u.nome) mapaNiveis[u.nome] = u.level || 0;
+                    if (u.email) mapaNiveis[u.email] = u.level || 0;
+                });
+            }
+
+            listaContainer.innerHTML = '';
+
+            posts.forEach((post, index) => {
+                const level = mapaNiveis[post.usuario_nome] || 0;
+                const ehAutor = usuarioAtual && (usuarioAtual.nome === post.usuario_nome || usuarioAtual.email === post.usuario_nome);
+
+                const card = document.createElement('div');
+                card.className = `card-post ${index === 0 ? 'novo-post' : ''}`;
+
+                card.innerHTML = `
+                    <p class="post-cabecalho">
+                        <strong>${escapeHtml(post.usuario_nome)}</strong>
+                        <span class="badge bg-primary">Lvl ${level}</span>
+                        <small class="post-data">(${formatarData(post.data_criacao)})</small>
+
+                        ${ehAutor ? `
+                            <button class="btn btn-sm btn-danger float-end" onclick="apagarPost(${post.id})" title="Deletar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                    <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </p>
+                    <p class="post-conteudo">${escapeHtml(post.mensagem).replace(/\n/g, '<br>')}</p>
+                `;
+
+                listaContainer.appendChild(card);
+            });
+        }
+
+        // Função para sanitizar textos HTML
+        function escapeHtml(texto) {
+            const div = document.createElement('div');
+            div.innerText = texto || '';
+            return div.innerHTML;
+        }
+
+        // Função para apagar publicação
+        async function apagarPost(id) {
+            if (!confirm('Tem certeza que deseja apagar este comentário?')) return;
+
+            const { error } = await supabaseClient
+                .from('posts')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Erro ao apagar o post.');
+                console.error(error);
+            } else {
+                carregarPosts();
+            }
+        }
+
+        // Envio do formulário
+        document.getElementById('form-post').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const mensagemInput = document.getElementById('mensagem');
+            const mensagem = mensagemInput.value.trim();
+
+            if (!mensagem) return;
+
+            const nomeAutor = usuarioAtual ? (usuarioAtual.nome || usuarioAtual.email) : 'Anônimo';
+
+            const { error } = await supabaseClient
+                .from('posts')
+                .insert([
+                    { usuario_nome: nomeAutor, mensagem: mensagem }
+                ]);
+
+            if (error) {
+                alert('Erro ao publicar a mensagem.');
+                console.error(error);
+            } else {
+                mensagemInput.value = '';
+                await carregarPosts();
+                const containerPosts = document.getElementById('lista-posts');
+                if (containerPosts) containerPosts.scrollTop = 0;
+            }
+        });
+
+        // Verificação de autenticação e inicialização
+        document.addEventListener('DOMContentLoaded', async () => {
+            let emailSalvo = localStorage.getItem('usuario_email');
+
+            if (!emailSalvo) {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session && session.user) {
+                    emailSalvo = session.user.email;
+                }
+            }
+
+            if (!emailSalvo) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            // Buscar dados do usuário atual
+            const { data: usuario } = await supabaseClient
+                .from('usuarios')
+                .select('nome, email')
+                .eq('email', emailSalvo)
+                .maybeSingle();
+
+            if (usuario) {
+                usuarioAtual = usuario;
+            } else {
+                usuarioAtual = { nome: emailSalvo.split('@')[0], email: emailSalvo };
+            }
+
+            carregarPosts();
+        });
+    </script>
+</body>
+</html>

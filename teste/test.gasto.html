@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gastos Mensais</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #d4ecff 0%, #b3dbff 100%);
+      color: #333;
+      padding: 20px 10px;
+      min-height: 100vh;
+    }
+
+    .app-title {
+      text-align: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2.8rem;
+      color: #ff7a00;
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0px #fff;
+      line-height: 1;
+      margin-bottom: 25px;
+    }
+
+    .main-wrapper {
+      max-width: 650px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* QUADRO SUPERIOR */
+    .top-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: rgba(255, 255, 255, 0.4);
+      padding: 15px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    .chart-and-list {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 15px;
+    }
+
+    .doughnut-box {
+      width: 160px;
+      height: 160px;
+    }
+
+    .top-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      max-width: 280px;
+      max-height: 170px;
+      overflow-y: auto;
+    }
+
+    .item-legenda-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* CARD PRINCIPAL AZUL */
+    .dashboard-card {
+      background: #7db9ff;
+      border: 4px solid #2d76f9;
+      border-radius: 25px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 75, 186, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* SEÇÃO DO GRÁFICO DE BARRAS */
+    .bar-chart-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      border-radius: 15px;
+    }
+
+    .bar-box {
+      flex: 1;
+      height: 180px;
+    }
+
+    .bar-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 180px;
+    }
+
+    /* INPUTS ESTILIZADOS */
+    .pill-input {
+      background: #ffffff;
+      border: 2px solid #ffaa5b;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      color: #ffaa5b;
+      font-weight: 600;
+      width: 100%;
+      outline: none;
+    }
+
+    .pill-input::placeholder {
+      color: #ffaa5b;
+      opacity: 0.8;
+    }
+
+    /* TABELA DE REGISTROS */
+    .table-container {
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #2d76f9;
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 40px;
+      background: #1e6bf2;
+      color: white;
+      text-align: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      padding: 8px 0;
+    }
+
+    .table-body {
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 40px;
+      text-align: center;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .table-row:nth-child(even) {
+      background: #f4f8ff;
+    }
+
+    /* CAIXA DE ALERTA DE SAÚDE FINANCEIRA */
+    .alerta-box {
+      padding: 12px 15px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 2px solid transparent;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .status-neutro { background: #ffffff; color: #495057; border-color: #ced4da; }
+    .status-bom { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+    .status-alerta { background: #fff3cd; color: #856404; border-color: #ffeeba; }
+    .status-perigo { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+    /* FORMULÁRIOS LADO A LADO */
+    .forms-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .form-box {
+      background: #0056c6;
+      border-radius: 15px;
+      padding: 12px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      text-align: center;
+      background: #1e6bf2;
+      padding: 5px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .form-field label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .form-field input {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* BOLINHA SELETORA DE COR */
+    #corCategoria {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .bolinha-cor {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: #ff6384;
+      border: 2px solid #ffffff;
+      cursor: pointer;
+      display: inline-block;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* BOTÕES */
+    .btn {
+      border: none;
+      border-radius: 20px;
+      padding: 8px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      color: white;
+      margin-top: 4px;
+    }
+
+    .btn-green { background: #4cd964; }
+    .btn-green:hover { background: #3db853; }
+    
+    .btn-del {
+      background: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+    .btn-del:hover { background: #d63025; }
+
+  </style>
+</head>
+<body>
+
+  <h1 class="app-title">Gastos<br>Mensais</h1>
+
+  <div class="main-wrapper">
+    
+    <div class="top-section">
+      <div class="chart-and-list">
+        <div class="doughnut-box">
+          <canvas id="graficoRosca"></canvas>
+        </div>
+        <div class="top-inputs" id="legendaTopo">
+          <span style="font-size: 0.8rem; text-align: center; color: #666;">Nenhum gasto adicionado</span>
+        </div>
+      </div>
+
+      <div id="mensagemSaude" class="alerta-box status-neutro">
+        Insira seu salário e adicione gastos para analisar sua situação financeira.
+      </div>
+    </div>
+
+    <div class="dashboard-card">
+
+      <div class="bar-chart-container">
+        <div class="bar-box">
+          <canvas id="graficoBarras"></canvas>
+        </div>
+        <div class="bar-inputs">
+          <input class="pill-input" id="resumoRenda" readonly placeholder="Sua renda mensal">
+          <input class="pill-input" id="resumoDespesa" readonly placeholder="Sua despesa mensal">
+          <input class="pill-input" id="resumoSaldo" readonly placeholder="Seu saldo em caixa">
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">
+          <div>CATEGORIA</div>
+          <div>DATA</div>
+          <div>QUANTIA</div>
+          <div></div>
+        </div>
+        <div class="table-body" id="tabelaCorpo">
+          </div>
+      </div>
+
+      <div class="forms-wrapper">
+        
+        <div class="form-box">
+          <div class="form-title">Inserir Novas Despesas</div>
+          
+          <div class="form-field">
+            <label>Categoria</label>
+            <div class="color-row">
+              <input type="text" id="despesaNome" placeholder="Ex: Lazer" style="flex:1;">
+              <label title="Escolher cor">
+                <input type="color" id="corCategoria" value="#ff6384" oninput="atualizarBolinha(this.value)">
+                <span class="bolinha-cor" id="previewBolinha"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Data</label>
+            <input type="date" id="despesaData">
+          </div>
+
+          <div class="form-field">
+            <label>Quantia</label>
+            <input type="number" id="despesaValor" step="0.01" placeholder="R$ 0,00">
+          </div>
+
+          <button class="btn btn-green" onclick="adicionarDespesa()">+ ADICIONAR</button>
+        </div>
+
+        <div class="form-box">
+          <div class="form-title">Inserir Salário / Renda</div>
+
+          <div class="form-field">
+            <label>Data da Receita</label>
+            <input type="date" id="receitaData">
+          </div>
+
+          <div class="form-field">
+            <label>Valor da Renda (R$)</label>
+            <input type="number" id="salarioInput" step="0.01" placeholder="Ex: 3000,00">
+          </div>
+
+          <button class="btn btn-green" onclick="definirSalario()">+ DEFINIR RENDA</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ESTADO DA APLICAÇÃO
+    let salarioTotal = 0;
+    const listaDespesas = [];
+
+    // Formatação de Moeda
+    function formatarMoeda(val) {
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // Atualização da Bolinha de Cor
+    function atualizarBolinha(cor) {
+      document.getElementById('previewBolinha').style.backgroundColor = cor;
+    }
+
+    // 1. GRÁFICO ROSCA (PIE/DOUGHNUT)
+    const ctxRosca = document.getElementById('graficoRosca').getContext('2d');
+    const chartRosca = new Chart(ctxRosca, {
+      type: 'doughnut',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        cutout: '60%'
+      }
+    });
+
+    // 2. GRÁFICO BARRAS
+    const ctxBarras = document.getElementById('graficoBarras').getContext('2d');
+    const chartBarras = new Chart(ctxBarras, {
+      type: 'bar',
+      data: {
+        labels: ['Renda', 'Despesas', 'Saldo'],
+        datasets: [{
+          data: [0, 0, 0],
+          backgroundColor: ['#447cff', '#b08bf8', '#ffb054'],
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, display: false },
+          x: { grid: { display: false }, ticks: { color: '#fff', font: { weight: 'bold' } } }
+        }
+      }
+    });
+
+    // DEFINIR SALÁRIO / RENDA
+    function definirSalario() {
+      const val = parseFloat(document.getElementById('salarioInput').value);
+
+      if (isNaN(val) || val <= 0) {
+        alert("Por favor, informe um valor de renda válido maior que zero!");
+        return;
+      }
+
+      salarioTotal = val;
+      atualizarTudo();
+    }
+
+    // ADICIONAR DESPESA
+    function adicionarDespesa() {
+      const nomeInput = document.getElementById('despesaNome');
+      const dataInput = document.getElementById('despesaData');
+      const valorInput = document.getElementById('despesaValor');
+      const corInput = document.getElementById('corCategoria');
+
+      const nome = nomeInput.value.trim();
+      const data = dataInput.value;
+      const valor = parseFloat(valorInput.value);
+      const cor = corInput.value;
+
+      if (!nome || isNaN(valor) || valor <= 0) {
+        alert("Por favor, preencha o nome da categoria e um valor válido!");
+        return;
+      }
+
+      let dataFormatada = "--/--/----";
+      if(data) {
+        const partes = data.split('-');
+        dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+
+      listaDespesas.push({ id: Date.now(), nome, data: dataFormatada, valor, cor });
+
+      nomeInput.value = '';
+      valorInput.value = '';
+
+      const novaCor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+      corInput.value = novaCor;
+      atualizarBolinha(novaCor);
+
+      atualizarTudo();
+    }
+
+    // REMOVER DESPESA ESPECÍFICA
+    function removerDespesa(id) {
+      const index = listaDespesas.findIndex(item => item.id === id);
+      if (index !== -1) {
+        listaDespesas.splice(index, 1);
+        atualizarTudo();
+      }
+    }
+
+    // ATUALIZAÇÃO CENTRALIZADA
+    function atualizarTudo() {
+      const totalDespesas = listaDespesas.reduce((sum, item) => sum + item.valor, 0);
+      const saldoFinal = salarioTotal - totalDespesas;
+
+      // 1. Atualizar Tabela
+      const corpo = document.getElementById('tabelaCorpo');
+      corpo.innerHTML = '';
+      listaDespesas.forEach(item => {
+        corpo.innerHTML += `
+          <div class="table-row">
+            <div>${item.nome}</div>
+            <div>${item.data}</div>
+            <div>${formatarMoeda(item.valor)}</div>
+            <div><button class="btn-del" onclick="removerDespesa(${item.id})" title="Remover item">✕</button></div>
+          </div>
+        `;
+      });
+
+      // 2. Atualizar Gráfico de Rosca
+      chartRosca.data.labels = listaDespesas.map(d => d.nome);
+      chartRosca.data.datasets[0].data = listaDespesas.map(d => d.valor);
+      chartRosca.data.datasets[0].backgroundColor = listaDespesas.map(d => d.cor);
+      chartRosca.update();
+
+      // 3. Atualizar Legenda do Topo
+      const containerTopo = document.getElementById('legendaTopo');
+      containerTopo.innerHTML = '';
+
+      if (listaDespesas.length === 0) {
+        containerTopo.innerHTML = '<span style="font-size: 0.8rem; text-align: center; color: #666;">Nenhum gasto adicionado</span>';
+      } else {
+        listaDespesas.forEach(item => {
+          containerTopo.innerHTML += `
+            <div class="item-legenda-row">
+              <input class="pill-input" readonly value="${item.nome}: ${formatarMoeda(item.valor)}" style="border-color:${item.cor}; color:${item.cor};">
+              <button class="btn-del" onclick="removerDespesa(${item.id})" title="Remover item">✕</button>
+            </div>
+          `;
+        });
+      }
+
+      // 4. Atualizar Gráfico de Barras e Resumo (Garantindo que Salário aparece 1 vez só)
+      chartBarras.data.datasets[0].data = [salarioTotal, totalDespesas, Math.max(0, saldoFinal)];
+      chartBarras.update();
+
+      document.getElementById('resumoRenda').value = salarioTotal ? formatarMoeda(salarioTotal) : 'Renda: R$ 0,00';
+      document.getElementById('resumoDespesa').value = totalDespesas ? formatarMoeda(totalDespesas) : 'Despesa: R$ 0,00';
+      document.getElementById('resumoSaldo').value = formatarMoeda(saldoFinal);
+
+      // 5. Atualizar Diagnóstico Financeiro
+      const caixaTexto = document.getElementById('mensagemSaude');
+
+      if (salarioTotal === 0 && totalDespesas === 0) {
+        caixaTexto.className = "alerta-box status-neutro";
+        caixaTexto.innerHTML = "Insira seu salário e adicione gastos para analisar sua situação financeira.";
+        return;
+      }
+
+      if (salarioTotal === 0) {
+        caixaTexto.className = "alerta-box status-neutro";
+        caixaTexto.innerHTML = `Gastos totais: <strong>${formatarMoeda(totalDespesas)}</strong>.<br>Informe seu salário para calcular o percentual comprometido.`;
+        return;
+      }
+
+      const percentual = (totalDespesas / salarioTotal) * 100;
+
+      if (totalDespesas > salarioTotal) {
+        caixaTexto.className = "alerta-box status-perigo";
+        caixaTexto.innerHTML = `🚨 <strong>Atenção! Orçamento Estourado!</strong><br>Seus gastos ultrapassaram sua renda em <strong>${formatarMoeda(Math.abs(saldoFinal))}</strong>!`;
+      } else if (percentual >= 80) {
+        caixaTexto.className = "alerta-box status-alerta";
+        caixaTexto.innerHTML = `⚠️ <strong>Gastos Elevados!</strong> Você usou <strong>${percentual.toFixed(1)}%</strong> da sua renda. Sobram apenas <strong>${formatarMoeda(saldoFinal)}</strong>.`;
+      } else {
+        caixaTexto.className = "alerta-box status-bom";
+        caixaTexto.innerHTML = `✅ <strong>Situação Financeira Saudável!</strong> Você comprometeu <strong>${percentual.toFixed(1)}%</strong> da sua renda. Sobram <strong>${formatarMoeda(saldoFinal)}</strong> no caixa.`;
+      }
+    }
+
+    // Inicialização
+    atualizarTudo();
+  </script>
+</body>
+</html>

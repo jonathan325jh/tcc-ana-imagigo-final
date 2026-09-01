@@ -1,0 +1,355 @@
+*{
+    padding: 0;
+    margin: 0;
+    outline: none;
+    box-sizing: border-box;
+}
+
+body {
+    background-image: url(pagEntrada.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6rem;
+    height: 18vh;
+    padding-bottom: 2rem;
+    position: relative;
+}
+
+header .logo-img {
+    width: 130px;
+    margin-left: 4rem;
+    margin-top: 2rem;
+    flex-shrink: 0;
+}
+
+header a {
+    text-decoration: none;
+    font-size: 25px;
+    color: black;
+    white-space: nowrap;
+    margin-top: 2rem; 
+}
+
+.avatar-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+#perfil {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.container-entrada {
+    flex: 1;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;    
+    justify-content: center;
+    text-align: center;
+    margin-top: 0;
+}
+
+.layout-centro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+}
+
+.boneco-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1rem; 
+}
+
+.card-usuario-foto {
+    border: 2px solid #e2c148;
+    border-radius: 20px;
+    width: 580px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+.sombra {
+    width: 150px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    filter: blur(4px);
+    margin: -15px auto 0 auto;
+}
+
+.topo-perfil-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.foto-perfil-circulo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.foto-perfil-circulo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dados-texto {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.nome-usuario-foto {
+    font-size: 22px;
+    color: #e2ba28;
+    font-weight: bold;
+}
+
+.container-barra-xp {
+    width: 100%;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.barra-xp-container {
+    width: 100%;
+    height: 30px;
+    background-color: transparent;
+    border: 2px solid #4f6cff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.barra-xp-fill {
+    height: 100%;
+    background-color: #fedc3c;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.barra-de-level {
+    width: 100%;
+    height: 22px;
+    background-color: transparent;
+    border: 2px solid #4f6cff;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    margin: 12px 0;
+}
+
+.xp-numeros {
+    font-size: 11px;
+    font-weight: bold;
+    color: #fedc3c;
+    margin-top: 4px;
+}
+
+.secao-insignias h3 {
+    color: #e2ba28;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.container-icones-insignia {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    min-height: 45px;
+}
+
+.circulo-insignia {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #fff;
+}
+
+.insignia-verde-icon { 
+    border: 3px solid #2ecc71; 
+    background-color: #2ecc7122; 
+}
+.insignia-laranja-icon { 
+    border: 3px solid #e67e22; 
+    background-color: #e67e2222; 
+}
+.insignia-azul-icon { 
+    border: 3px solid #3498db; 
+    background-color: #3498db22; 
+}
+.insignia-rosa-icon { 
+    border: 3px solid #e91e63; 
+    background-color: #e91e6322; 
+}
+
+.container-entrada p{
+    font-size: 13px;
+    color: #888;
+    font-style: italic;
+}
+
+.botoes {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12rem;
+}
+
+.botoes a {
+    margin-top: 5px;
+    margin-bottom: 2rem;
+    text-decoration: none;
+    font-size: 23px;
+    color: black;
+    padding-top: 5px;
+    width: 200px;
+    height: 6vh;
+    border-radius: 5px;
+}
+
+#tutoriais{
+    text-align: center;
+    background-color: #ff7300bd;
+    border: solid 3px #ff7300;
+}
+
+#forum{
+    text-align: center;
+    background-color: #ffac0690;
+    border: solid 3px #ffaa06;
+}
+
+#banco{
+    text-align: center;
+    background-color: #ff1d596f;
+    border: solid 3px #ff1d59;
+}
+
+#gestao{
+    text-align: center;
+    background-color: #00d02673;
+    border: solid 3px #00d027;
+}
+
+#tutoriais:hover{
+    transform: scale(1.1);
+    background-color: #fb5800bc;
+    border: solid 3px #e96c05;
+    color: white;
+}
+
+#forum:hover{
+    transform: scale(1.1);
+    background-color: #ff9b0690;
+    border: solid 3px #dd9505;
+    color: white;
+}
+
+#banco:hover{
+    transform: scale(1.1);
+    background-color: #ff1d5dae;
+    border: solid 3px #f4134f;
+    color: white;
+}
+
+#gestao:hover{
+    transform: scale(1.1);
+    color: white;
+    background-color: #0ed00073;
+    border: solid 3px #04b925;
+}
+
+#inicio:hover, #config:hover, #sobre:hover, #suporte:hover{
+    color: #432cd9;
+}
+
+#criar-p {
+    text-align: center;
+    margin-top: 1rem; 
+    margin-bottom: 1.5rem;
+    font-size: 35px;
+    font-weight: bold;
+    background: linear-gradient(90deg, #000761, #000761, #1622c2, #1622c2, #192fc6, #4a7ff7, #4ca3f4, #64c5df, #5ce1e6, #d7daf8,#d7daf8);
+    letter-spacing: 2px;
+    background-clip: text;
+    color: transparent;
+}
+
+/* 1. Animação de flutuação para o personagem (SVG) */
+#boneco-principal {
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+    background-color: transparent !important;
+    
+    /* Aplica a animação no personagem */
+    animation: flutuar 3s ease-in-out infinite;
+}
+
+/* 2. Estilo e animação para a sombra */
+.sombra {
+    width: 150px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    filter: blur(4px);
+    margin: -15px auto 0 auto;
+    
+    /* Aplica a animação sincronizada na sombra */
+    animation: sombraFlutuar 3s ease-in-out infinite;
+}
+
+/* --- KEYFRAMES --- */
+
+/* Movimento do personagem (sobe e desce) */
+@keyframes flutuar {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-16px); /* Altura máxima da flutuação */
+    }
+}
+
+/* Reação da sombra (reduz e clareia quando o personagem sobe) */
+@keyframes sombraFlutuar {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.65); /* Fica menor */
+        opacity: 0.4;         /* Fica mais fraca */
+    }
+}

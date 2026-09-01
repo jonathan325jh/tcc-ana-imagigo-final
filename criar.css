@@ -1,0 +1,419 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    outline: none;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6rem;
+    height: 18vh;
+    padding-bottom: 2rem;
+    position: relative;
+}
+
+header .logo-img {
+    width: 130px;
+    margin-left: 4rem;
+    margin-top: 2rem;
+    flex-shrink: 0;
+}
+
+header a {
+    text-decoration: none;
+    font-size: 25px;
+    color: black;
+    white-space: nowrap;
+    margin-top: 2rem; 
+}
+
+#perfil {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 0.1rem;
+    flex-shrink: 0;
+}
+
+body.corpito{
+    background-image: url(pagEntrada.png);
+    background-position: auto;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.botoes-pao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12rem;
+}
+
+.botoes-pao a {
+  margin-top: 10px;
+  text-decoration: none;
+  font-size: 23px;
+  color: black;
+  padding-top: 5px;
+  width: 200px;
+  height: 6vh;
+  border-radius: 5px;
+}
+
+#tutoriais{
+    text-align: center;
+    background-color: #ff7300bd;
+    border: solid 3px #ff7300;
+}
+
+#forum{
+    text-align: center;
+    background-color: #ffac0690;
+    border: solid 3px #ffaa06;
+}
+
+#banco{
+    text-align: center;
+    background-color: #ff1d596f;
+    border: solid 3px #ff1d59;
+}
+
+#gestao{
+    text-align: center;
+    background-color: #00d02673;
+    border: solid 3px #00d027;
+}
+
+#tutoriais:hover{
+    transform: scale(1.1);
+    background-color: #fb5800bc;
+    border: solid 3px #e96c05;
+    color: white;
+}
+
+#forum:hover{
+    transform: scale(1.1);
+    background-color: #ff9b0690;
+    border: solid 3px #dd9505;
+    color: white;
+}
+
+#banco:hover{
+    transform: scale(1.1);
+    background-color: #ff1d5dae;
+    border: solid 3px #f4134f;
+    color: white;
+}
+
+#gestao:hover{
+    transform: scale(1.1);
+    color: white;
+    background-color: #0ed00073;
+    border: solid 3px #04b925;
+}
+
+#tutoriais:active{
+    background-color: #fb5800cc;
+    border: solid 3px #e96c05;
+    color: white;
+}
+
+#forum:active{
+    background-color: #ff9b06bc;
+    border: solid 3px #dd9505;
+    color: white;
+}
+
+#banco:active{
+    background-color: #ff1d5dc6;
+}
+
+#gestao:active{
+    background-color: #0ed000aa;
+    border: solid 3px #04b925;
+}
+
+#inicio:hover{
+    color: #432cd9;
+}
+
+#config:hover{
+    color: #432cd9;
+}
+
+#sobre:hover{
+    color: #432cd9;
+}
+
+#suporte:hover{
+    color: #432cd9;
+}
+
+.conteudo-principal {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start; 
+    gap: 50px;
+    margin-top: 2rem;
+}
+
+.container {
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    align-items: center;
+    padding: 30px;
+}
+
+.coluna-formulario {
+    display: flex;
+    flex-direction: column;
+    width: 50rem;
+    gap: 10px; 
+}
+
+.formulario {
+    margin-top: 5rem;
+    border: 2px solid #ffcc66;
+    border-radius: 25px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 37vh;
+    width: 80%; 
+    color: #fedc3c;
+}
+
+.form-itens {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.perfil-topo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.perfil-texto {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+#foto-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+
+.sombra {
+    width: 140px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    filter: blur(4px);
+    margin: -10px auto 0 auto;
+}
+
+.boneco-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.baixo {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.circulos {
+    display: flex; 
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.form-itens h2 {
+    width: 100%;
+}
+
+.botao-custom {
+    display: right;
+    justify-content: flex-end; 
+    width: 100%;
+}
+
+.botao-custom button {
+    padding: 10px 20px;
+    background-color: #ffd0009c;
+    border: solid 4px #ffd200;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.botao-custom button:hover{
+    transform: scale(1.1);
+    background-color: #ffd000c3;
+    border: solid 4px #ecc414;
+    color: white;
+}
+
+.avatar-container {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    padding: 4px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.insignia-verde {
+    border: 4px solid #2ecc71;
+}
+
+.insignia-laranja {
+    border: 4px solid #e67e22;
+}
+
+.insignia-azul {
+    border: 4px solid #3498db;
+}
+
+.insignia-rosa {
+    border: 4px solid #e91e63;
+    box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+}
+
+.barra-de-level {
+    width: 100%;
+    height: 22px;
+    background-color: transparent;
+    border: 2px solid #4f6cff;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    margin: 12px 0;
+}
+
+.nivel-atual {
+    height: 100%;
+    background-color: #fedc3c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.4s ease-in-out;
+}
+
+#texto-porcentagem {
+    font-size: 12px;
+    font-weight: bold;
+    color: #fedc3c;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}
+
+.container-barra-xp {
+    width: 100%;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.barra-xp-fundo {
+    width: 100%;
+    height: 30px;
+    background-color: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #4f6cff;
+}
+
+.barra-xp-progresso {
+    height: 100%;
+    background-color: #fedc3c;
+    border-radius: 10px;
+    transition: width 0.4s ease-in-out;
+}
+
+.texto-xp {
+    font-size: 11px;
+    color: #fedc3c;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.insignia-bloqueada {
+    opacity: 0.4;
+}
+
+.insignia-ativa {
+    opacity: 1;
+}
+
+#boneco-svg {
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+    background-color: transparent !important;
+    
+    /* Aplica a animação no personagem */
+    animation: flutuar 3s ease-in-out infinite;
+}
+
+/* 2. Estilo e animação para a sombra */
+.sombra {
+    width: 150px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    filter: blur(4px);
+    margin: -15px auto 0 auto;
+    
+    /* Aplica a animação sincronizada na sombra */
+    animation: sombraFlutuar 3s ease-in-out infinite;
+}
+
+/* --- KEYFRAMES --- */
+
+/* Movimento do personagem (sobe e desce) */
+@keyframes flutuar {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-16px); /* Altura máxima da flutuação */
+    }
+}
+
+/* Reação da sombra (reduz e clareia quando o personagem sobe) */
+@keyframes sombraFlutuar {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.65); /* Fica menor */
+        opacity: 0.4;         /* Fica mais fraca */
+    }
+}

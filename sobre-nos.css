@@ -1,0 +1,86 @@
+*{
+    margin: 0;
+    outline: none;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+header {
+    width: auto;
+    padding-bottom: 6rem;
+}
+
+body.sobre-fundo{
+    background-image: 
+    url(sobre-nos.png),
+    url(fundo2-sobre.png),
+    url('fundo-para.png'),
+    url('fundo-sobre-dois.png');
+
+    background-repeat:
+     no-repeat,
+     no-repeat,
+     no-repeat,
+     no-repeat;
+
+    background-size: 
+    70%,
+    99%,
+    30%,
+    20%;
+
+    background-position: 
+    100% top,
+    79% 70%,
+    100% bottom,
+    left bottom;
+}
+
+#voltar{
+    width: 8%;
+}
+
+.volta-dois{
+    margin-left: 5rem;
+    margin-top: 2rem;
+}
+
+video {
+    max-width: 20%;  
+    height: auto;
+    margin-left: 10rem;
+    border: none;
+    outline: none;
+
+}
+
+.container {
+    display: flex;
+    text-align: center;
+    gap: 1rem; 
+    margin-top: 5rem;
+    border: none;
+}
+
+.texto {
+    font-size: 27px;
+    margin-top: 3rem;
+    line-height: 2rem;
+}
+
+.paragrafoSobre {
+    font-size: 27px;
+    text-align: center;
+    margin-top: 3rem;
+    line-height: 2rem;
+    letter-spacing: 2%;
+}
+
+.segundo-para {
+    font-size: 27px;
+    text-align: center;
+    margin-top: 20rem;
+    line-height: 2rem;
+    letter-spacing: 2%;
+}

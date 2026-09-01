@@ -1,0 +1,164 @@
+* {
+    padding: 0;
+    margin: 0;
+    outline: none;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-image: url(fundo-perfil.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    position: relative;
+}
+
+.header-lateral {
+    position: absolute;
+    top: 35px;
+    left: 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+#voltar {
+    width: 7rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+#tres-pontos {
+    width: 7rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+#voltar:hover, #tres-pontos:hover {
+    transform: scale(1.08);
+}
+
+.container {
+    background-color: #ffcc668e;
+    border: solid 3px #ffcc66;
+    box-shadow: 0 8px 25px rgba(247, 185, 70, 0.5);
+    width: 480px;
+    min-height: 520px;
+    padding: 3rem 2.5rem 2rem 2.5rem;
+    border-radius: 20px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.pri-parte {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+#login {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+.pri-parte h3 {
+    font-size: 26px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.email-texto {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.habilidades {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 2.5rem;
+}
+
+.habilidades h2 {
+    color: #ffaa06;
+    font-size: 22px;
+}
+
+.circulos {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    min-height: 50px;
+    align-items: center;
+}
+
+.insignia-item {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #fff;
+}
+
+.insignia-verde { border: 3px solid #2ecc71; background-color: #2ecc7122; }
+.insignia-laranja { border: 3px solid #e67e22; background-color: #e67e2222; }
+.insignia-azul { border: 3px solid #3498db; background-color: #3498db22; }
+.insignia-rosa { border: 3px solid #e91e63; background-color: #e91e6322; }
+
+.sem-insignia {
+    font-size: 14px;
+    color: #888;
+    font-style: italic;
+}
+
+.botoes-rodape {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 50px;
+}
+
+#btn-sair {
+    background-color: #ff1d59;
+    width: 110px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#btn-sair:hover {
+    transform: scale(1.05);
+    background-color: #e0154c;
+}
+#termo {
+    font-size: 20px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+#termo:hover {
+    color: #432cd9;
+}

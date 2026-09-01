@@ -1,0 +1,99 @@
+*{
+    margin: 0;
+    outline: none;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.fundo{
+    background-image: 
+        url('foto-logo.png'), 
+        url('Login.png');
+
+    background-size: 
+        50% auto,
+        cover;
+        
+
+    background-position: 
+        80% 50%,  
+        center;
+
+    background-repeat: 
+        no-repeat,   
+        no-repeat;
+
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;  
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    gap: 1em;
+    font-family: 'Cooper Hewitt', sans-serif;
+    background-color: rgba(255, 222, 89, 0.5);
+    border-radius: 2%;
+    border: solid 4px rgb(255, 197, 89);
+    width: 30%;
+    margin-right: 50em;
+    height: 81vh;
+    display: flex;
+    flex-direction: column;    
+    align-items: center;
+    justify-content: center;
+}
+
+#foto-perfil{
+    display: block;
+    background-position: fixed;
+    width: 40%;
+    margin-left: 5px;
+    margin-top: 4em;
+}
+
+
+
+h1{
+    text-align: center;
+    margin-top: 20px
+}
+
+
+.container-botoes {
+    display: flex;
+    flex-direction: column; 
+    width: 80%;   
+    gap: 20px;  
+    margin-top: 2em;  
+}
+
+#entrar {
+    cursor: pointer;
+    background-color: rgba(251, 165, 6, 0.381);
+    border-radius: 10px;
+    font-size: 26px;
+    width: 100%;
+    height: 10vh;
+    border: solid 5px rgba(251, 165, 6);
+}
+
+#voltar {
+    cursor: pointer;
+    background-color: rgba(251, 165, 6, 0.381);
+    border-radius: 10px;
+    font-size: 26px;
+    width: 100%;
+    height: 10vh;
+    border: solid 5px rgba(251, 165, 6);
+}
+
+#entrar:hover, #voltar:hover {
+    background-color: rgba(255, 128, 0, 0.505);
+}
+
+#entrar:active, #voltar:active {
+    background-color: rgba(252, 244, 79, 0.505);
+}

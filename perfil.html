@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="perfil.css"> 
+    <title>Perfil</title>
+    <style>
+        /* Estilos das Insígnias Transparentes com Cores Fortes */
+        .circulos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+            justify-content: flex-start;
+        }
+
+        .insignia-circulo {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500; /* Texto mais fino */
+            font-size: 0.7rem; /* Tamanho discreto do texto */
+            background: transparent !important; /* Sem fundo */
+            transition: all 0.3s ease;
+            text-align: center;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        /* Insígnias Desbloqueadas (Bordas sólidas com cores fortes) */
+        .insignia-lvl100 {
+            border: 2px solid #00b894;
+            color: #00b894;
+        }
+
+        .insignia-lvl300 {
+            border: 2px solid #e67e22;
+            color: #e67e22;
+        }
+
+        .insignia-lvl500 {
+            border: 2px solid #0984e3;
+            color: #0984e3;
+        }
+
+        .insignia-lvl900 {
+            border: 2px solid #e84393;
+            color: #e84393;
+        }
+
+        /* Insígnias Bloqueadas (Borda normal/sólida em cinza) */
+        .insignia-bloqueada {
+            border: 2px solid #cccccc !important;
+            color: #999999 !important;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-lateral">
+        <a href="pagina-entrada.html">
+            <img src="voltar-bt.png" id="voltar" alt="Voltar">
+        </a>
+        <img src="tres-pontos.png" id="tres-pontos" alt="Opções">
+    </header>
+
+    <main class="container">
+        <div class="pri-parte">
+            <img src="foto-login.png" id="login" alt="Foto de Perfil">
+            
+            <h3 id="usuario-nome">Carregando...</h3>
+            <p class="email-texto" id="usuario-email">...</p>
+
+            <div class="habilidades">
+                <h2>Insígnias</h2>
+                <div class="circulos" id="container-insignias">
+                    <!-- Insígnias redondas inseridas via JavaScript -->
+                </div>
+            </div>
+            
+            <div class="botoes-rodape">
+                <button type="button" id="btn-sair">Sair da conta</button>
+                <a id="termo" href="termos.html">TERMOS DE USO</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- SDK do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4c2ZwbXF3aHB2YWp6eXJhcHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4OTU0MDAsImV4cCI6MjEwMzQ3MTQwMH0.qNgFa9lbwdqEjVFM2Su4yHchR_vtl7w9QOOrPYe1wsA";
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 1. Verifica se o usuário está logado
+        const emailSalvo = localStorage.getItem('usuario_email');
+
+        if (!emailSalvo) {
+            window.location.href = 'login.html';
+        }
+
+        // 2. Função para carregar os dados do perfil
+        async function carregarPerfil() {
+            try {
+                const { data: usuarios, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('nome, email, level, xp')
+                    .eq('email', emailSalvo);
+
+                if (error) throw error;
+
+                if (usuarios && usuarios.length > 0) {
+                    const usuario = usuarios[0];
+                    const nome = usuario.nome || 'Usuário';
+                    const email = usuario.email || emailSalvo;
+                    const level = Number(usuario.level) || 1;
+                    const xp = Number(usuario.xp) || 0;
+
+                    // Preenche as informações na tela
+                    document.getElementById('usuario-nome').innerText = nome;
+                    document.getElementById('usuario-email').innerText = email;
+
+                    // Renderiza as insígnias
+                    renderizarInsignias(level, xp);
+                } else {
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                }
+            } catch (erro) {
+                console.error("Erro ao carregar o perfil:", erro);
+            }
+        }
+
+        // 3. Função para renderizar insígnias
+        function renderizarInsignias(level, xp) {
+            const container = document.getElementById('container-insignias');
+            container.innerHTML = '';
+
+            const listaInsignias = [
+    {
+        rotulo: 'LVL 100',
+        classeColorida: 'insignia-lvl100',
+        desbloqueada: level >= 100
+    },
+    {
+        rotulo: 'LVL 300',
+        classeColorida: 'insignia-lvl300',
+        desbloqueada: level >= 300
+    },
+    {
+        rotulo: 'LVL 500',
+        classeColorida: 'insignia-lvl500',
+        desbloqueada: level >= 500
+    },
+    {
+        rotulo: 'LVL 900',
+        classeColorida: 'insignia-lvl900',
+        desbloqueada: level >= 900
+    }
+];
+
+            listaInsignias.forEach(item => {
+                const el = document.createElement('div');
+                
+                if (item.desbloqueada) {
+                    el.className = `insignia-circulo ${item.classeColorida}`;
+                } else {
+                    el.className = 'insignia-circulo insignia-bloqueada';
+                }
+
+                el.innerText = item.rotulo;
+                container.appendChild(el);
+            });
+        }
+
+        // 4. Ação do Botão Sair
+        document.getElementById('btn-sair').addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        });
+
+        // Executa o carregamento ao abrir a página
+        carregarPerfil();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+* {
+    margin: 0;
+    outline: none;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-image: url(Suporte-fundo.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center top;    
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; 
+    font-family: sans-serif;
+    position: relative;
+}
+
+#tres-pontos {
+    position: absolute;
+    top: 5rem;
+    left: 4rem;
+    right: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+}
+
+#voltar {
+    position: absolute;
+    left: 5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.volta-dois img {
+    position: relative;
+    height: auto;
+}
+
+#voltar {
+    width: 6rem;
+}
+
+#tres-pontos {
+    width: 7rem;
+}
+
+.conteudo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 2.5rem;
+    text-align: center;
+}
+
+.container-principal {
+    text-align: center;
+}
+
+.container-principal h1 {
+    font-size: 3.5rem;
+    letter-spacing: 2px;
+    background-image: linear-gradient(to right, #000761, #0055ff, #3477ff, #b6ccf9, #4bddea);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#logo {
+    margin-top: 5px;
+    width: 80%;
+    height: auto;
+}
+
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 85%;
+    margin: 2rem auto 0 auto;
+}
+
+.img-su {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    transform: translateY(-190px); 
+}
+
+#suporte-img {
+    width: 380px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.container-caixa {
+    margin-bottom: 13rem;
+    border: solid 3px #000761;
+    border-radius: 20px;
+    padding: 20px;
+    height: 340px;
+    width: 680px;
+    background-color: rgba(255, 255, 255, 0.304);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    position: relative;
+    margin-right: 190px; 
+}
+
+textarea#dois {
+    font-size: 23px;
+    color: #000761;
+    width: 100%;
+    height: 75%;          
+    background: transparent;
+    border: none;
+    resize: none;
+    font-family: sans-serif;
+}
+
+#botao {
+    align-self: flex-end;
+    width: 120px;
+    height: 45px;
+    border: solid 2px #000761;
+    border-radius: 10px;
+    font-size: 17px;
+    background-color: #00066124;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#botao:hover {
+    background-color: #00066144;
+}
