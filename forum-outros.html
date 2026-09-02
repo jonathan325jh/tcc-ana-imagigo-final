@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fórum - Outros</title>
+    <link rel="stylesheet" href="forum-conserto.css">
+    <link rel="stylesheet" href="forum.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    
+    <header>
+        <div class="lado-esquerdo">
+            <a href="" onclick="history.back(); return false;">
+                <img src="voltar-bt.png" id="voltar" class="voltar-bt" alt="Voltar">
+            </a>
+            <div class="menu-opcoes">
+                <img src="tres-pontos-azul-btn.png" id="tres-pontos" class="tres-pontos-btn" alt="Opções">
+                <div class="dropdown">
+                    <a href="#">Opção 1</a>
+                    <a href="#">Opção 2</a>
+                </div>
+            </div>
+        </div>
+        
+        <img src="sobre-nos.png" class="logo-img" alt="Logo">
+    </header>
+
+    <div class="search">
+        <label for="searchInput">
+            <span class="material-symbols-outlined">search</span>
+        </label>
+        <input type="text" id="searchInput" placeholder="Pesquisar">
+    </div>
+
+    <br>
+    <br>
+
+    <div class="links">
+        <a href="forum-limpeza.html">Limpeza</a>
+        <a href="forum-conserto.html">Conserto</a>
+        <a href="forum-receitas.html">Receitas</a>
+        <a href="forum-financas.html">Finanças</a>
+        <a href="forum-outros.html">Outros</a>
+    </div>
+    <hr class="divisor">
+    
+    <div class="container-forum">
+        <div class="compartilhar-area">
+    
+            <div class="compartilhar-campo" id="compartilharCampo">
+                <img src="perfil.png" class="avatar-compartilhar">
+    
+                <textarea
+                    id="mensagem"
+                    placeholder="Compartilhe suas experiências..."
+                    rows="1"
+                ></textarea>
+            </div>
+    
+            <div class="area-publicar" id="areaPublicar">
+                <button id="btn-publicar">
+                    POSTAR
+                </button>
+            </div>
+    
+        </div>
+    
+        <div id="lista-posts">
+            <p class="carregando">Carregando publicações...</p>
+        </div>
+
+        <div id="container-notificacao"></div>
+    
+    </div>
+
+<script>
+const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_4N34f8bpdw9lZ-YtGJwq-w_8gC49zeW";
+
+const CATEGORIA_PAGINA = "outros"; 
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let usuarioAtual = null;
+let usuariosCache = {};
+
+function exibirNotificacao(titulo, subtitulo, icone = '⚡', ehLevelUp = false) {
+    const container = document.getElementById('container-notificacao');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast-xp ${ehLevelUp ? 'toast-level' : ''}`;
+
+    toast.innerHTML = `
+        <div class="toast-icone">${icone}</div>
+        <div class="toast-conteudo">
+            <span class="toast-titulo">${titulo}</span>
+            <span class="toast-subtitulo">${subtitulo}</span>
+        </div>
+        <button class="toast-fechar" onclick="fecharToast(this.parentElement)">&times;</button>
+        <div class="toast-barra-progresso"></div>
+    `;
+
+    container.appendChild(toast);
+    setTimeout(() => {
+        fecharToast(toast);
+    }, 7000);
+}
+
+function fecharToast(toastElement) {
+    if (!toastElement) return;
+    toastElement.style.animation = 'slideOut 0.4s ease forwards';
+    setTimeout(() => {
+        toastElement.remove();
+    }, 400);
+}
+
+async function adicionarXP(email, quantidade, motivo) {
+    try {
+        const { data: usuario, error } = await supabaseClient
+            .from('usuarios')
+            .select('xp, level')
+            .eq('email', email)
+            .maybeSingle();
+
+        if (error || !usuario) {
+            console.error("Erro ao buscar usuário:", error);
+            return;
+        }
+
+        let xpAtual = parseInt(usuario.xp || 0);
+        let levelAtual = Math.floor(xpAtual / 100);
+
+        let novoXp = xpAtual + quantidade;
+        let novoLevel = Math.floor(novoXp / 100);
+
+        const { error: updateError } = await supabaseClient
+            .from('usuarios')
+            .update({ xp: novoXp, level: novoLevel })
+            .eq('email', email);
+
+        if (updateError) {
+            console.error("Erro ao atualizar dados no Supabase:", updateError);
+            return;
+        }
+
+        if (usuarioAtual) {
+            usuarioAtual.level = novoLevel;
+        }
+
+        exibirNotificacao(`+${quantidade} XP Conquistados!`, motivo, '⭐');
+
+        if (novoLevel > levelAtual) {
+            setTimeout(() => {
+                exibirNotificacao(`NÍVEL ALCANÇADO! 🎉`, `Você subiu para o Level ${novoLevel}!`, '🏆', true);
+            }, 600);
+        }
+
+        localStorage.setItem('usuario_xp_atualizado', Date.now());
+
+    } catch (err) {
+        console.error("Erro ao processar adição de XP:", err);
+    }
+}
+
+function formatarData(dataIso) {
+    if (!dataIso) return '';
+    const data = new Date(dataIso);
+    return data.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function escapeHtml(texto) {
+    const div = document.createElement('div');
+    div.innerText = texto || '';
+    return div.innerHTML;
+}
+
+async function carregarUsuarioAtual() {
+    let email = localStorage.getItem('usuario_email');
+
+    if (!email) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session && session.user) {
+            email = session.user.email;
+        }
+    }
+
+    if (!email) {
+        window.location.href = "login.html";
+        return false;
+    }
+
+    const { data: usuario } = await supabaseClient
+        .from('usuarios')
+        .select('nome, nome_personagem, email, xp, level')
+        .eq('email', email)
+        .maybeSingle();
+
+    if (usuario) {
+        const xp = Number(usuario.xp) || 0;
+        const levelCalculado = Math.floor(xp / 100);
+        usuarioAtual = {
+            nome: usuario.nome_personagem || usuario.nome || email.split('@')[0],
+            email: email,
+            level: levelCalculado
+        };
+    } else {
+        usuarioAtual = {
+            nome: email.split('@')[0],
+            email: email,
+            level: 0
+        };
+    }
+
+    return true;
+}
+
+async function carregarUsuarios() {
+    const { data, error } = await supabaseClient
+        .from('usuarios')
+        .select('nome, nome_personagem, email, xp, level');
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    usuariosCache = {};
+
+    if (data) {
+        data.forEach(usuario => {
+            const xp = Number(usuario.xp) || 0;
+            const levelCalculado = Math.floor(xp / 100);
+            const nome = usuario.nome_personagem || usuario.nome || 'Usuário';
+
+            usuariosCache[nome] = {
+                nome: nome,
+                level: levelCalculado,
+                email: usuario.email
+            };
+
+            if (usuario.email) {
+                usuariosCache[usuario.email] = {
+                    nome: nome,
+                    level: levelCalculado,
+                    email: usuario.email
+                };
+            }
+        });
+    }
+}
+
+async function carregarPosts() {
+    const lista = document.getElementById('lista-posts');
+
+    const { data: posts, error } = await supabaseClient
+        .from('posts')
+        .select('*')
+        .eq('categoria', CATEGORIA_PAGINA)
+        .order('id', { ascending: false });
+
+    if (error) {
+        console.error(error);
+        lista.innerHTML = '<p>Erro ao carregar as publicações.</p>';
+        return;
+    }
+
+    if (!posts || posts.length === 0) {
+        lista.innerHTML = '<p class="carregando">Nenhuma publicação ainda nesta categoria.</p>';
+        return;
+    }
+
+    lista.innerHTML = '';
+
+    for (const post of posts) {
+        await criarPost(post, lista);
+    }
+}
+
+async function criarPost(post, lista) {
+    const usuario = usuariosCache[post.usuario_nome] || {
+        nome: post.usuario_nome || 'Usuário',
+        level: 0
+    };
+
+    const { data: reacoes } = await supabaseClient
+        .from('post_reacoes')
+        .select('tipo, usuario_email')
+        .eq('post_id', post.id);
+
+    const curtidas = (reacoes || []).filter(r => r.tipo === 'curtida').length;
+    const naoCurtidas = (reacoes || []).filter(r => r.tipo === 'nao_curti').length;
+
+    let minhaReacao = null;
+
+    if (usuarioAtual) {
+        const reacaoUsuario = (reacoes || []).find(r => r.usuario_email === usuarioAtual.email);
+        if (reacaoUsuario) {
+            minhaReacao = reacaoUsuario.tipo;
+        }
+    }
+
+    const ehAutor = usuarioAtual && (
+        usuarioAtual.email === post.usuario_email ||
+        usuarioAtual.nome === post.usuario_nome
+    );
+
+    const card = document.createElement('div');
+    card.className = 'card-post';
+    card.dataset.postId = post.id;
+
+    card.innerHTML = `
+        <div class="post-header">
+            <img src="perfil.png" class="post-avatar">
+            <div class="post-dados">
+                <span class="post-nome">${escapeHtml(usuario.nome)}</span>
+                <span class="post-level">Level ${usuario.level}</span>
+                <span class="post-data">${formatarData(post.data_criacao)}</span>
+            </div>
+            ${ehAutor ? `<button class="btn-apagar" onclick="apagarPost(${post.id})" title="Excluir publicação">🗑</button>` : ''}
+        </div>
+        <div class="post-conteudo">
+            ${escapeHtml(post.mensagem).replace(/\n/g, '<br>')}
+        </div>
+        <div class="post-acoes">
+            <button class="acao-post curtida ${minhaReacao === 'curtida' ? 'ativo' : ''}" onclick="reagir(${post.id}, 'curtida')">
+                <span class="icone-acao">△</span>
+                <span class="quantidade">${curtidas}</span>
+            </button>
+            <button class="acao-post nao-curti ${minhaReacao === 'nao_curti' ? 'ativo' : ''}" onclick="reagir(${post.id}, 'nao_curti')">
+                <span class="icone-acao">▽</span>
+                <span class="quantidade">${naoCurtidas}</span>
+            </button>
+            <button class="acao-post" onclick="abrirComentarios(${post.id})">
+                <span class="icone-acao">💬</span>
+                <span>Comentários</span>
+            </button>
+        </div>
+        <div class="comentarios-area" id="comentarios-${post.id}">
+            <div id="lista-comentarios-${post.id}">Carregando comentários...</div>
+            <form class="form-comentario" onsubmit="enviarComentario(event, ${post.id})">
+                <input type="text" class="input-comentario" placeholder="Escreva um comentário..." maxlength="500" required>
+                <button type="submit" class="btn-comentar">ENVIAR</button>
+            </form>
+        </div>
+    `;
+
+    lista.appendChild(card);
+}
+
+async function reagir(postId, tipo) {
+    if (!usuarioAtual) return;
+
+    const { data: existente } = await supabaseClient
+        .from('post_reacoes')
+        .select('*')
+        .eq('post_id', postId)
+        .eq('usuario_email', usuarioAtual.email)
+        .maybeSingle();
+
+    if (existente) {
+        if (existente.tipo === tipo) {
+            const { error } = await supabaseClient
+                .from('post_reacoes')
+                .delete()
+                .eq('id', existente.id);
+
+            if (error) {
+                console.error(error);
+                alert('Erro ao remover reação.');
+                return;
+            }
+        } else {
+            const { error } = await supabaseClient
+                .from('post_reacoes')
+                .update({ tipo: tipo })
+                .eq('id', existente.id);
+
+            if (error) {
+                console.error(error);
+                alert('Erro ao alterar reação.');
+                return;
+            }
+        }
+    } else {
+        const { error } = await supabaseClient
+            .from('post_reacoes')
+            .insert({
+                post_id: postId,
+                usuario_email: usuarioAtual.email,
+                tipo: tipo
+            });
+
+        if (error) {
+            console.error(error);
+            alert('Erro ao registrar reação.');
+            return;
+        }
+    }
+
+    carregarPosts();
+}
+
+async function abrirComentarios(postId) {
+    const area = document.getElementById(`comentarios-${postId}`);
+    if (!area) return;
+
+    area.classList.toggle('aberto');
+
+    if (area.classList.contains('aberto')) {
+        await carregarComentarios(postId);
+    }
+}
+
+async function carregarComentarios(postId) {
+    const lista = document.getElementById(`lista-comentarios-${postId}`);
+
+    const { data: comentarios, error } = await supabaseClient
+        .from('comentarios')
+        .select('*')
+        .eq('post_id', postId)
+        .order('id', { ascending: true });
+
+    if (error) {
+        console.error(error);
+        lista.innerHTML = 'Erro ao carregar comentários.';
+        return;
+    }
+
+    if (!comentarios || comentarios.length === 0) {
+        lista.innerHTML = '<p>Nenhum comentário ainda.</p>';
+        return;
+    }
+
+    lista.innerHTML = '';
+
+    comentarios.forEach(comentario => {
+        const usuario = usuariosCache[comentario.usuario_nome] || {
+            nome: comentario.usuario_nome || 'Usuário',
+            level: 0
+        };
+
+        const div = document.createElement('div');
+        div.className = 'comentario';
+
+        div.innerHTML = `
+            <img src="perfil.png" class="comentario-avatar">
+            <div class="comentario-conteudo">
+                <div>
+                    <span class="comentario-nome">${escapeHtml(usuario.nome)}</span>
+                    <span class="comentario-level">Level ${usuario.level}</span>
+                </div>
+                <div class="comentario-texto">${escapeHtml(comentario.mensagem)}</div>
+                <div class="comentario-data">${formatarData(comentario.data_criacao)}</div>
+            </div>
+        `;
+
+        lista.appendChild(div);
+    });
+}
+
+async function enviarComentario(event, postId) {
+    event.preventDefault();
+    if (!usuarioAtual) return;
+
+    const form = event.target;
+    const input = form.querySelector('.input-comentario');
+    const mensagem = input.value.trim();
+
+    if (!mensagem) return;
+
+    const { error } = await supabaseClient
+        .from('comentarios')
+        .insert({
+            post_id: postId,
+            usuario_nome: usuarioAtual.nome,
+            usuario_email: usuarioAtual.email,
+            mensagem: mensagem
+        });
+
+    if (error) {
+        console.error(error);
+        alert('Erro ao enviar comentário.');
+        return;
+    }
+
+    input.value = '';
+    await carregarComentarios(postId);
+}
+
+async function apagarPost(id) {
+    if (!confirm('Tem certeza que deseja apagar esta publicação?')) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from('posts')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        alert('Erro ao apagar publicação.');
+        return;
+    }
+
+    carregarPosts();
+}
+
+async function publicar() {
+    if (!usuarioAtual) return;
+
+    const textarea = document.getElementById('mensagem');
+    const mensagem = textarea.value.trim();
+
+    if (!mensagem) return;
+
+    const botao = document.getElementById('btn-publicar');
+    botao.disabled = true;
+    botao.textContent = 'POSTANDO...';
+
+    const { error } = await supabaseClient
+        .from('posts')
+        .insert({
+            usuario_nome: usuarioAtual.nome,
+            usuario_email: usuarioAtual.email,
+            mensagem: mensagem,
+            categoria: CATEGORIA_PAGINA,
+            data_criacao: new Date().toISOString()
+        });
+
+    if (error) {
+        console.error(error);
+        alert('Erro ao publicar a mensagem: ' + error.message);
+        botao.disabled = false;
+        botao.textContent = 'POSTAR';
+        return;
+    }
+
+    textarea.value = '';
+
+    document.querySelector('.compartilhar-area').classList.remove('aberto');
+    document.getElementById('areaPublicar').classList.remove('ativo');
+
+    botao.disabled = false;
+    botao.textContent = 'POSTAR';
+
+    await adicionarXP(usuarioAtual.email, 5, 'Por criar uma nova publicação no fórum!');
+
+    await carregarUsuarios();
+    await carregarPosts();
+}
+
+function ativarCompartilhar() {
+    const area = document.querySelector('.compartilhar-area');
+    const publicar = document.getElementById('areaPublicar');
+
+    area.classList.add('aberto');
+    publicar.classList.add('ativo');
+}
+
+document.getElementById('searchInput').addEventListener('input', function () {
+    const termo = this.value.toLowerCase().trim();
+
+    document.querySelectorAll('.card-post').forEach(card => {
+        const texto = card.innerText.toLowerCase();
+        card.style.display = texto.includes(termo) ? '' : 'none';
+    });
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const ok = await carregarUsuarioAtual();
+    if (!ok) return;
+
+    await carregarUsuarios();
+    await carregarPosts();
+
+    const mensagemTextarea = document.getElementById('mensagem');
+
+    mensagemTextarea.addEventListener('focus', ativarCompartilhar);
+
+    document.getElementById('compartilharCampo').addEventListener('click', () => {
+        mensagemTextarea.focus();
+    });
+
+    document.getElementById('btn-publicar').addEventListener('click', publicar);
+
+    mensagemTextarea.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            publicar();
+        }
+    });
+
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'usuario_xp_atualizado') {
+            carregarUsuarioAtual();
+        }
+    });
+});
+</script>
+</body>
+</html>

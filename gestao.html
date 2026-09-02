@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gastos Mensais</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="gestao.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="voltar">
+      <a href="" onclick="history.back(); return false;">
+        <img src="voltar-bt.png" id="voltar" alt="Voltar">
+      </a>
+      <img src="tres-pontos.png" id="tres-pontos" alt="Opções">
+    </div>
+    <h1 class="app-title">GASTOS<br><span class="mensais">MENSAIS</span></h1>
+
+    <div class="top-card">
+      <div class="doughnut-wrapper">
+        <canvas id="graficoRosca"></canvas>
+        <div class="doughnut-center-text">
+          <div class="title">Total</div>
+          <div class="amount" id="textoTotal">R$0,00</div>
+        </div>
+      </div>
+
+      <div class="top-summary">
+        <div class="summary-pill pill-renda" id="resumoRenda">Renda mensal: R$0,00</div>
+        <div class="summary-pill pill-saldo" id="resumoSaldo">Saldo em caixa: R$0,00</div>
+        <div class="summary-pill pill-despesa" id="resumoDespesa">Despesas: R$0,00</div>
+      </div>
+    </div>
+
+    <div class="categories-list" id="listaCategorias">
+    </div>
+
+    <div class="management-box">
+      <div class="input-row">
+        <div class="color-btn">
+          <input type="color" id="corEntrada" value="#29b6f6">
+        </div>
+        <input type="number" id="valorEntrada" placeholder="Digite a quantia (R$) entrada">
+        <input type="text" id="nomeEntrada" placeholder="Digite o nome da entrada">
+        <button class="btn-add" onclick="adicionarRenda()">ADICIONAR</button>
+      </div>
+
+      <div class="input-row">
+        <div class="color-btn">
+          <input type="color" id="corDespesa" value="#ef5350">
+        </div>
+        <input type="number" id="valorDespesa" placeholder="Digite a quantia (R$) despesa">
+        <input type="text" id="nomeDespesa" placeholder="Digite o nome da despesa">
+        <button class="btn-add" onclick="adicionarDespesa()">ADICIONAR</button>
+      </div>
+
+      <div class="goals-section">
+        <div class="goals-title">Metas</div>
+        <div class="goals-content">
+          <div class="goals-form">
+            <label>Nome</label>
+            <input type="text" id="metaNome">
+            <label>Quantia da meta</label>
+            <input type="number" id="metaValor">
+            <label>Início</label>
+            <input type="date" id="metaInicio">
+            <button class="btn-add" style="margin-top:5px;" onclick="adicionarMeta()">ADICIONAR</button>
+          </div>
+
+          <div class="goals-display" id="listaMetas">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://yxsfpmqwhpvajzyrapyi.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_4N34f8bpdw9lZ-YtGJwq-w_8gC49zeW';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let rendaTotal = 0;
+    let despesas = [];
+    let metas = [];
+
+    const ctxRosca = document.getElementById('graficoRosca').getContext('2d');
+    const chartRosca = new Chart(ctxRosca, {
+      type: 'doughnut',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        cutout: '75%'
+      }
+    });
+
+    function formatarMoeda(val) {
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    async function carregarDados() {
+      try {
+        const { data: dadosEntradas } = await _supabase.from('entradas').select('*');
+        if (dadosEntradas && dadosEntradas.length > 0) {
+          rendaTotal = dadosEntradas.reduce((acc, item) => acc + Number(item.valor), 0);
+        }
+
+        const { data: dadosDespesas } = await _supabase.from('despesas').select('*');
+        if (dadosDespesas) {
+          despesas = dadosDespesas.map(d => ({
+            id: d.id,
+            nome: d.nome,
+            valor: Number(d.valor),
+            cor: d.cor
+          }));
+        }
+
+        const { data: dadosMetas } = await _supabase.from('metas').select('*');
+        if (dadosMetas) {
+          metas = dadosMetas.map(m => {
+            const formatarData = (strData) => {
+              if (!strData) return '';
+              const partes = strData.split('T')[0].split('-');
+              if (partes.length === 3) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+              }
+              return strData;
+            };
+
+            return {
+              id: m.id,
+              nome: m.nome,
+              valorTotal: Number(m.valor_total),
+              valorSemanal: Number(m.valor_semanal),
+              inicio: formatarData(m.data_inicio),
+              fim: formatarData(m.data_fim)
+            };
+          });
+        }
+      } catch (err) {
+        console.error('Erro ao carregar dados:', err);
+      }
+
+      atualizarTela();
+    }
+
+    async function adicionarRenda() {
+      const val = parseFloat(document.getElementById('valorEntrada').value);
+      const nome = document.getElementById('nomeEntrada').value.trim();
+
+      if (!isNaN(val) && val > 0) {
+        rendaTotal += val;
+        
+        document.getElementById('valorEntrada').value = '';
+        document.getElementById('nomeEntrada').value = '';
+        atualizarTela();
+
+        try {
+          await _supabase.from('entradas').insert([{ nome, valor: val }]);
+        } catch(e) {
+          console.error('Erro ao salvar renda:', e);
+        }
+      }
+    }
+
+    async function adicionarDespesa() {
+      const nome = document.getElementById('nomeDespesa').value.trim();
+      const valor = parseFloat(document.getElementById('valorDespesa').value);
+      const cor = document.getElementById('corDespesa').value;
+
+      if (nome && !isNaN(valor) && valor > 0) {
+        const novaDespesa = { id: Date.now(), nome, valor, cor };
+        despesas.push(novaDespesa);
+        
+        document.getElementById('nomeDespesa').value = '';
+        document.getElementById('valorDespesa').value = '';
+        atualizarTela();
+
+        try {
+          await _supabase.from('despesas').insert([{ nome, valor, cor }]);
+        } catch(e) {
+          console.error('Erro ao salvar despesa:', e);
+        }
+      }
+    }
+
+    async function adicionarMeta() {
+      const nome = document.getElementById('metaNome').value.trim();
+      const valor = parseFloat(document.getElementById('metaValor').value);
+      const inicioInput = document.getElementById('metaInicio').value;
+
+      if (nome && !isNaN(valor) && valor > 0 && inicioInput) {
+        const [ano, mes, dia] = inicioInput.split('-').map(Number);
+        const dataInicio = new Date(ano, mes - 1, dia);
+
+        const dataFim = new Date(dataInicio);
+        dataFim.setMonth(dataFim.getMonth() + 1);
+
+        const valorSemanal = valor / 4;
+
+        const isoInicio = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+        const isoFim = `${dataFim.getFullYear()}-${String(dataFim.getMonth() + 1).padStart(2, '0')}-${String(dataFim.getDate()).padStart(2, '0')}`;
+
+        const strInicioExibicao = dataInicio.toLocaleDateString('pt-BR');
+        const strFimExibicao = dataFim.toLocaleDateString('pt-BR');
+
+        metas.push({
+          id: Date.now(),
+          nome,
+          valorTotal: valor,
+          valorSemanal,
+          inicio: strInicioExibicao,
+          fim: strFimExibicao
+        });
+
+        document.getElementById('metaNome').value = '';
+        document.getElementById('metaValor').value = '';
+        document.getElementById('metaInicio').value = '';
+        atualizarTela();
+
+        try {
+          await _supabase.from('metas').insert([{
+            nome,
+            valor_total: valor,
+            valor_semanal: valorSemanal,
+            data_inicio: isoInicio,
+            data_fim: isoFim
+          }]);
+        } catch(e) {
+          console.error('Erro ao salvar meta:', e);
+        }
+      }
+    }
+
+    function atualizarTela() {
+      const totalDespesas = despesas.reduce((acc, d) => acc + d.valor, 0);
+      const saldo = rendaTotal - totalDespesas;
+
+      document.getElementById('textoTotal').innerText = formatarMoeda(totalDespesas);
+      document.getElementById('resumoRenda').innerText = `Renda mensal: ${formatarMoeda(rendaTotal)}`;
+      document.getElementById('resumoSaldo').innerText = `Saldo em caixa: ${formatarMoeda(saldo)}`;
+      document.getElementById('resumoDespesa').innerText = `Despesas: ${formatarMoeda(totalDespesas)}`;
+
+      chartRosca.data.labels = despesas.map(d => d.nome);
+      chartRosca.data.datasets[0].data = despesas.map(d => d.valor);
+      chartRosca.data.datasets[0].backgroundColor = despesas.map(d => d.cor);
+      chartRosca.update();
+
+      const containerCategorias = document.getElementById('listaCategorias');
+      containerCategorias.innerHTML = '';
+      despesas.forEach(d => {
+        const perc = totalDespesas > 0 ? ((d.valor / totalDespesas) * 100).toFixed(0) : 0;
+        containerCategorias.innerHTML += `
+          <div class="category-card">
+            <div class="category-header" style="background-color: ${d.cor};">${d.nome}</div>
+            <div class="category-body">${perc}% (${formatarMoeda(d.valor)})</div>
+          </div>
+        `;
+      });
+
+      const containerMetas = document.getElementById('listaMetas');
+      containerMetas.innerHTML = '';
+      metas.forEach(m => {
+        containerMetas.innerHTML += `
+          <div class="goal-card">
+            <div class="goal-name">${m.nome}</div>
+            <div class="goal-weekly">${formatarMoeda(m.valorSemanal)} / semana</div>
+            <div class="goal-dates">${m.inicio} - ${m.fim}</div>
+          </div>
+        `;
+      });
+    }
+
+    carregarDados();
+  </script>
+</body>
+</html>

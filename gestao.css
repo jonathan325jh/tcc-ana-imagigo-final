@@ -1,0 +1,300 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    outline: none;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #e0f7fa;
+    color: #333;
+    padding: 20px;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.app-container {
+    width: 100%;
+    background: #e0f7fa;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+}
+
+.voltar {
+    position: absolute;
+    top: 0;
+    left: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    z-index: 10;
+}
+
+#voltar {
+    width: 7rem;
+    height: auto;
+    display: block;
+    cursor: pointer;
+}
+
+#tres-pontos {
+    width: 7rem;
+    height: auto;
+    display: block;
+    cursor: pointer;
+}
+
+.app-title {
+    text-align: center;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 55px;
+    color: #ff7a00;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.mensais {
+    -webkit-text-stroke: 1.5px #ffaa06;
+    color: transparent;
+    font-size: 4rem;
+}
+
+.top-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    width: 100%;
+}
+
+.doughnut-wrapper {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    flex-shrink: 0;
+}
+
+.doughnut-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.doughnut-center-text .title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #000;
+}
+
+.doughnut-center-text .amount {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.top-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    width: 100%;
+}
+
+.summary-pill {
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    width: 100%;
+    height: 7vh;
+}
+
+.pill-renda { background: #9c27b0; }
+.pill-saldo { background: #29b6f6; }
+.pill-despesa { background: #ef5350; }
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.category-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: #fff;
+    text-align: center;
+    width: 100%;
+}
+
+.category-header {
+    padding: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #000;
+    text-transform: uppercase;
+}
+
+.category-body {
+    padding: 10px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.management-box {
+    width: 100%;
+    background: #64b5f6;
+    border: 3px solid #1e88e5;
+    border-radius: 15px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.color-btn {
+    width: 40px;
+    height: 35px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, red, orange, yellow, green, blue, indigo, violet);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.color-btn input[type="color"] {
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.input-row input[type="text"], 
+.input-row input[type="number"], 
+.input-row input[type="date"] {
+    flex: 1;
+    border: 1px solid #ffa726;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 1.1rem;
+    height: 3rem;
+}
+
+.btn-add {
+    background: #76ff03;
+    border: 3px solid #53c506;
+    color: #388e3c;
+    border-radius: 10px;
+    padding: 8px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+/* SEÇÃO DE METAS */
+.goals-section {
+    background: #29b6f6;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.goals-title {
+    text-align: center;
+    font-family: 'Fredoka', sans-serif;
+    -webkit-text-stroke: 1.5px #efd093;
+    color: transparent;
+    font-size: 38px;
+}
+
+.goals-content {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+.goals-form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.goals-form label {
+    font-size: 15px;
+    color: white;
+    font-weight: 600;
+}
+
+.goals-form input {
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.95rem;
+    width: 100%;
+    height: 36px;
+}
+
+.goals-display {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.goal-card {
+    background: #0288d1;
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.85rem;
+    width: 100%;
+}
+
+.goal-card .goal-name {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.goal-card .goal-weekly {
+    margin: 4px 0;
+    font-weight: 600;
+}
+
+.goal-card .goal-dates {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
