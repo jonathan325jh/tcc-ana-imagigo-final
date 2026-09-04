@@ -10,9 +10,9 @@
 
     <header>
         <div class="volta-dois">
-        <a href="" onclick="history.back(); return false;">
-            <img src="voltar-azul-btn.png" id="voltar">
-        </a>
+            <a href="" onclick="history.back(); return false;">
+                <img src="voltar-azul-btn.png" id="voltar" alt="Voltar">
+            </a>
             <img src="tres-pontos-azul-btn.png" id="tres-pontos" alt="Opções">
         </div>
     </header>
@@ -29,11 +29,57 @@
             <img src="suporte-img.png" id="suporte-img" alt="Suporte">
         </div>
         
-        <div class="container-caixa">
-            <textarea id="dois" name="text" placeholder="Fala que eu te escuto..."></textarea>
+        <form class="container-caixa" id="formSuporte">
+            <textarea id="dois" name="text" placeholder="Fala que eu te escuto..." required></textarea>
             <button id="botao" type="submit">Enviar</button>
-        </div>
+        </form>
     </div>
+
+    <!-- Biblioteca do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4c2ZwbXF3aHB2YWp6eXJhcHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4OTU0MDAsImV4cCI6MjEwMzQ3MTQwMH0.qNgFa9lbwdqEjVFM2Su4yHchR_vtl7w9QOOrPYe1wsA";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Substitua pelo seu endereço de e-mail para onde o feedback deve ser direcionado
+        const EMAIL_SUPORTE = "seuemaildesuporte@dominio.com";
+
+        document.getElementById('formSuporte').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const campoTexto = document.getElementById('dois');
+            const mensagem = campoTexto.value.trim();
+            const emailUsuario = localStorage.getItem('usuario_email') || 'Usuário Não Identificado';
+
+            if (!mensagem) {
+                alert('Por favor, digite uma mensagem antes de enviar.');
+                return;
+            }
+
+            try {
+                // 1. Salva a mensagem enviada na tabela 'feedbacks' no Supabase
+                const { error } = await supabaseClient
+                    .from('feedbacks')
+                    .insert([{ email: emailUsuario, mensagem: mensagem }]);
+
+                if (error) {
+                    console.warn("Aviso ao salvar no Supabase:", error.message);
+                }
+
+                // 2. Abre o cliente de e-mail local preenchido para envio
+                const assunto = encodeURIComponent(`Feedback/Suporte - ${emailUsuario}`);
+                const corpo = encodeURIComponent(`Mensagem do usuário (${emailUsuario}):\n\n${mensagem}`);
+                window.location.href = `mailto:${EMAIL_SUPORTE}?subject=${assunto}&body=${corpo}`;
+
+                alert('Mensagem registrada com sucesso!');
+                campoTexto.value = '';
+            } catch (err) {
+                console.error("Erro inesperado:", err);
+                alert('Ocorreu um erro ao processar seu envio.');
+            }
+        });
+    </script>
 
 </body>
 </html>
