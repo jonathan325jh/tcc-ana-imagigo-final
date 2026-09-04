@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Sistemas</title>
+    <link rel="stylesheet" href="config.css">
+    <style>
+        .select-field {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+        }
+        .select-field option {
+            background-color: #2c3e50;
+            color: #fff;
+        }
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input { display: none; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            transition: .3s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #4a7bc7; }
+        input:checked + .slider:before { transform: translateX(20px); }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="boneco-area-sidebar">
+                <svg id="boneco-principal" class="boneco-flutuante" width="180" height="250" viewBox="0 0 200 280">
+                    <defs>
+                        <clipPath id="recorte-corpo-sidebar">
+                            <path d="M 100,60 C 75,60 62,72 44,100 C 35,114 47,128 55,115 C 65,99 71,90 76,94 C 73,115 67,155 62,215 C 60,228 76,228 78,215 C 84,175 92,142 100,142 C 108,142 116,175 122,215 C 124,228 140,228 138,215 C 133,155 127,115 124,94 C 129,90 135,99 145,115 C 153,128 165,114 156,100 C 138,72 125,60 100,60 Z" />
+                        </clipPath>
+                    </defs>
+                    <g id="elementos-fundo-svg"></g>
+                    <circle id="cabeca-boneco" cx="100" cy="40" r="18" fill="#4a7bc7" />
+                    <path id="corpo-boneco" d="M 100,60 C 75,60 62,72 44,100 C 35,114 47,128 55,115 C 65,99 71,90 76,94 C 73,115 67,155 62,215 C 60,228 76,228 78,215 C 84,175 92,142 100,142 C 108,142 116,175 122,215 C 124,228 140,228 138,215 C 133,155 127,115 124,94 C 129,90 135,99 145,115 C 153,128 165,114 156,100 C 138,72 125,60 100,60 Z" fill="#4a7bc7" />
+                    <g clip-path="url(#recorte-corpo-sidebar)" id="grupo-estampas"></g>
+                    <image id="img-roupa" x="33" y="35" width="140" height="170" href="" />
+                    <image id="img-chapeu" x="70" y="2" width="60" height="46" href="" />
+                </svg>
+                <div class="sombra-boneco"></div>
+            </div>
+        </div>
+
+        <div class="content-panel">
+            <div class="panel-title" id="lblIdioma">IDIOMA DO SISTEMA</div>
+            <div class="input-group">
+                <select id="selectIdioma" class="select-field">
+                    <option value="pt">Português (BR)</option>
+                    <option value="en">English (US)</option>
+                    <option value="es">Español</option>
+                </select>
+            </div>
+
+            <div class="panel-title" id="lblNotificacoes" style="margin-top: 15px;">NOTIFICAÇÕES</div>
+            <div class="toggle-group">
+                <span id="lblNotifEmail">Notificações por E-mail</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="chkNotifEmail" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-group">
+                <span id="lblNotifPush">Notificações Push (Navegador)</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="chkNotifPush" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="panel-title" id="lblAudio" style="margin-top: 15px;">ÁUDIO</div>
+            <div class="toggle-group">
+                <span id="lblSomFundo">Som de Fundo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="chkSomFundo" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="action-buttons" style="margin-top: 15px;">
+                <button class="btn btn-delete" type="button" id="btnExcluir">Excluir</button>
+                <button class="btn btn-save" type="button" id="btnSalvar">Salvar</button>
+                <button class="btn btn-default" type="button" id="btnPadrao">Padrão</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="config-conta.html" class="nav-item nav-conta" id="navConta">Conta</a>
+        <a href="config-sistemas.html" class="nav-item nav-sistemas active" id="navSistemas">Sistemas</a>
+        <a href="config-personalizacao.html" class="nav-item nav-personalizacao" id="navPersonalizacao">Personalização</a>
+        <a href="config-privacidade.html" class="nav-item nav-privacidade" id="navPrivacidade">Privacidade</a>
+    </nav>
+
+    <div class="overlay-modal" id="modalNotificacao" style="display: none;">
+        <div class="modal-box modal-success">
+            <span class="modal-close" id="fecharModalNotificacao">&times;</span>
+            <div class="modal-title" id="tituloModalNotificacao">ALTERAÇÕES SALVAS</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4c2ZwbXF3aHB2YWp6eXJhcHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4OTU0MDAsImV4cCI6MjEwMzQ3MTQwMH0.qNgFa9lbwdqEjVFM2Su4yHchR_vtl7w9QOOrPYe1wsA";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const caminhoRoupas = { 'nenhuma': '', 'camiseta': 'camisa.png', 'jaqueta': 'img/roupas/jaqueta.png' };
+        const caminhoChapeus = { 'nenhum': '', 'bone': 'chapeu.png', 'festa': 'img/chapeus/chapeu-festa.png' };
+        const email = localStorage.getItem('usuario_email') || "";
+
+        let dadosOriginais = null;
+
+        const traducoes = {
+            pt: {
+                lblIdioma: "IDIOMA DO SISTEMA",
+                lblNotificacoes: "NOTIFICAÇÕES",
+                lblNotifEmail: "Notificações por E-mail",
+                lblNotifPush: "Notificações Push (Navegador)",
+                lblAudio: "ÁUDIO",
+                lblSomFundo: "Som de Fundo",
+                btnExcluir: "Excluir",
+                btnSalvar: "Salvar",
+                btnPadrao: "Padrão",
+                navConta: "Conta",
+                navSistemas: "Sistemas",
+                navPersonalizacao: "Personalização",
+                navPrivacidade: "Privacidade",
+                msgSalvo: "ALTERAÇÕES SALVAS",
+                msgErro: "ERRO AO SALVAR ALTERAÇÕES",
+                msgRestaurado: "CONFIGURAÇÕES RESTAURADAS"
+            },
+            en: {
+                lblIdioma: "SYSTEM LANGUAGE",
+                lblNotificacoes: "NOTIFICATIONS",
+                lblNotifEmail: "Email Notifications",
+                lblNotifPush: "Push Notifications (Browser)",
+                lblAudio: "AUDIO",
+                lblSomFundo: "Background Sound",
+                btnExcluir: "Delete",
+                btnSalvar: "Save",
+                btnPadrao: "Default",
+                navConta: "Account",
+                navSistemas: "Systems",
+                navPersonalizacao: "Customization",
+                navPrivacidade: "Privacy",
+                msgSalvo: "CHANGES SAVED",
+                msgErro: "ERROR SAVING CHANGES",
+                msgRestaurado: "SETTINGS RESTORED"
+            },
+            es: {
+                lblIdioma: "IDIOMA DEL SISTEMA",
+                lblNotificacoes: "NOTIFICACIONES",
+                lblNotifEmail: "Notificaciones por Correo",
+                lblNotifPush: "Notificaciones Push (Navegador)",
+                lblAudio: "AUDIO",
+                lblSomFundo: "Sonido de Fondo",
+                btnExcluir: "Eliminar",
+                btnSalvar: "Guardar",
+                btnPadrao: "Predeterminado",
+                navConta: "Cuenta",
+                navSistemas: "Sistemas",
+                navPersonalizacao: "Personalización",
+                navPrivacidade: "Privacidad",
+                msgSalvo: "CAMBIOS GUARDADOS",
+                msgErro: "ERROR AL GUARDAR CAMBIOS",
+                msgRestaurado: "CONFIGURACIONES RESTAURADAS"
+            }
+        };
+
+        function aplicarIdiomaInterface(lang) {
+            const t = traducoes[lang] || traducoes['pt'];
+            document.getElementById('lblIdioma').innerText = t.lblIdioma;
+            document.getElementById('lblNotificacoes').innerText = t.lblNotificacoes;
+            document.getElementById('lblNotifEmail').innerText = t.lblNotifEmail;
+            document.getElementById('lblNotifPush').innerText = t.lblNotifPush;
+            document.getElementById('lblAudio').innerText = t.lblAudio;
+            document.getElementById('lblSomFundo').innerText = t.lblSomFundo;
+            document.getElementById('btnExcluir').innerText = t.btnExcluir;
+            document.getElementById('btnSalvar').innerText = t.btnSalvar;
+            document.getElementById('btnPadrao').innerText = t.btnPadrao;
+            document.getElementById('navConta').innerText = t.navConta;
+            document.getElementById('navSistemas').innerText = t.navSistemas;
+            document.getElementById('navPersonalizacao').innerText = t.navPersonalizacao;
+            document.getElementById('navPrivacidade').innerText = t.navPrivacidade;
+        }
+
+        document.getElementById('selectIdioma').addEventListener('change', (e) => {
+            aplicarIdiomaInterface(e.target.value);
+        });
+
+        function exibirNotificacao(texto) {
+            document.getElementById('tituloModalNotificacao').innerText = texto;
+            document.getElementById('modalNotificacao').style.display = 'flex';
+        }
+
+        document.getElementById('fecharModalNotificacao').addEventListener('click', () => {
+            document.getElementById('modalNotificacao').style.display = 'none';
+        });
+
+        async function carregar() {
+            if (!email) return;
+            try {
+                const { data } = await supabaseClient.from('usuarios').select('*').eq('email', email);
+                if (data && data.length > 0) {
+                    dadosOriginais = data[0];
+                    aplicarDados(dadosOriginais);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function aplicarDados(u) {
+            const lang = u.idioma || 'pt';
+            document.getElementById('selectIdioma').value = lang;
+            aplicarIdiomaInterface(lang);
+
+            document.getElementById('chkNotifEmail').checked = u.notif_email !== false;
+            document.getElementById('chkNotifPush').checked = u.notif_push !== false;
+            document.getElementById('chkSomFundo').checked = u.som_fundo !== false;
+
+            document.getElementById('cabeca-boneco').setAttribute('fill', u.cor_1 || '#4a7bc7');
+            document.getElementById('corpo-boneco').setAttribute('fill', u.cor_1 || '#4a7bc7');
+
+            const grupoEstampas = document.getElementById('grupo-estampas');
+            grupoEstampas.innerHTML = '';
+            if (u.estampa === 'bolinhas') {
+                grupoEstampas.innerHTML = `<circle cx="80" cy="90" r="8" fill="${u.cor_2 || '#ff0000'}" /><circle cx="120" cy="110" r="12" fill="${u.cor_2 || '#ff0000'}" /><circle cx="95" cy="140" r="10" fill="${u.cor_2 || '#ff0000'}" /><circle cx="110" cy="180" r="9" fill="${u.cor_2 || '#ff0000'}" />`;
+            } else if (u.estampa === 'linhas') {
+                let l = '';
+                for (let o = -250; o < 400; o += 16) { l += `<line x1="${o + 250}" y1="0" x2="${o}" y2="280" stroke="${u.cor_2 || '#ff0000'}" stroke-width="5" />`; }
+                grupoEstampas.innerHTML = l;
+            }
+
+            document.getElementById('img-roupa').setAttribute('href', caminhoRoupas[u.roupa] || '');
+            document.getElementById('img-chapeu').setAttribute('href', caminhoChapeus[u.chapeu] || '');
+        }
+
+        document.getElementById('btnSalvar').addEventListener('click', async () => {
+            const lang = document.getElementById('selectIdioma').value;
+            const notifEmail = document.getElementById('chkNotifEmail').checked;
+            const notifPush = document.getElementById('chkNotifPush').checked;
+            const somFundo = document.getElementById('chkSomFundo').checked;
+
+            try {
+                await supabaseClient.from('usuarios').update({
+                    idioma: lang,
+                    notif_email: notifEmail,
+                    notif_push: notifPush,
+                    som_fundo: somFundo
+                }).eq('email', email);
+
+                if (dadosOriginais) {
+                    dadosOriginais.idioma = lang;
+                    dadosOriginais.notif_email = notifEmail;
+                    dadosOriginais.notif_push = notifPush;
+                    dadosOriginais.som_fundo = somFundo;
+                }
+
+                const t = traducoes[lang] || traducoes['pt'];
+                exibirNotificacao(t.msgSalvo);
+            } catch (err) {
+                console.error(err);
+                const t = traducoes[lang] || traducoes['pt'];
+                exibirNotificacao(t.msgErro);
+            }
+        });
+
+        document.getElementById('btnExcluir').addEventListener('click', () => {
+            exibirNotificacao('CONTA EXCLUÍDA');
+        });
+
+        document.getElementById('btnPadrao').addEventListener('click', () => {
+            if (dadosOriginais) {
+                aplicarDados(dadosOriginais);
+                const lang = dadosOriginais.idioma || 'pt';
+                const t = traducoes[lang] || traducoes['pt'];
+                exibirNotificacao(t.msgRestaurado);
+            }
+        });
+
+        carregar();
+    </script>
+</body>
+</html>

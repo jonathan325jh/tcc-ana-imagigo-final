@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Personalização</title>
+    <link rel="stylesheet" href="config.css">
+    <style>
+        /* Ajustes de compactação para manter a mesma altura das outras telas */
+        .content-panel {
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+
+        .panel-title {
+            margin-top: 8px !important;
+            margin-bottom: 4px !important;
+            font-size: 11px;
+        }
+
+        .clothes-grid {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .btn-clothes {
+            flex: 1;
+            padding: 6px 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .btn-clothes:hover { background-color: rgba(255, 255, 255, 0.4); }
+        .btn-clothes.active { border-color: #fff; background-color: rgba(255, 255, 255, 0.5); }
+
+        .color-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .color-picker-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .color-input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .color-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-input::-webkit-color-swatch {
+            border: 1.5px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+        }
+
+        .input-field {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="boneco-area-sidebar">
+                <svg id="boneco-principal" class="boneco-flutuante" width="180" height="250" viewBox="0 0 200 280">
+                    <defs>
+                        <clipPath id="recorte-corpo-sidebar">
+                            <path d="M 100,60 C 75,60 62,72 44,100 C 35,114 47,128 55,115 C 65,99 71,90 76,94 C 73,115 67,155 62,215 C 60,228 76,228 78,215 C 84,175 92,142 100,142 C 108,142 116,175 122,215 C 124,228 140,228 138,215 C 133,155 127,115 124,94 C 129,90 135,99 145,115 C 153,128 165,114 156,100 C 138,72 125,60 100,60 Z" />
+                        </clipPath>
+                    </defs>
+                    <g id="elementos-fundo-svg"></g>
+                    <circle id="cabeca-boneco" cx="100" cy="40" r="18" fill="#4a7bc7" />
+                    <path id="corpo-boneco" d="M 100,60 C 75,60 62,72 44,100 C 35,114 47,128 55,115 C 65,99 71,90 76,94 C 73,115 67,155 62,215 C 60,228 76,228 78,215 C 84,175 92,142 100,142 C 108,142 116,175 122,215 C 124,228 140,228 138,215 C 133,155 127,115 124,94 C 129,90 135,99 145,115 C 153,128 165,114 156,100 C 138,72 125,60 100,60 Z" fill="#4a7bc7" />
+                    <g clip-path="url(#recorte-corpo-sidebar)" id="grupo-estampas"></g>
+                    <image id="img-roupa" x="33" y="35" width="140" height="170" href="" />
+                    <image id="img-chapeu" x="70" y="2" width="60" height="46" href="" />
+                </svg>
+                <div class="sombra-boneco"></div>
+            </div>
+        </div>
+
+        <div class="content-panel">
+            <div class="panel-title" style="margin-top:0 !important;">PERSONAGEM</div>
+            <div class="input-group">
+                <input type="text" id="nomePersonagem" class="input-field" placeholder="Nome do Personagem">
+            </div>
+
+            <div class="panel-title">CORES</div>
+            <div class="color-row">
+                <div class="color-picker-group">
+                    <span>Cor Corpo</span>
+                    <input type="color" id="corPrincipal" class="color-input" value="#4a7bc7">
+                </div>
+                <div class="color-picker-group">
+                    <span>Cor Detalhe</span>
+                    <input type="color" id="corEstampa" class="color-input" value="#ff0000">
+                </div>
+            </div>
+
+            <div class="panel-title">ESTAMPA</div>
+            <div class="clothes-grid">
+                <button type="button" class="btn-clothes" data-estampa="nenhuma">Nenhuma</button>
+                <button type="button" class="btn-clothes" data-estampa="bolinhas">Bolinhas</button>
+                <button type="button" class="btn-clothes" data-estampa="linhas">Linhas</button>
+            </div>
+
+            <div class="panel-title">ROUPA</div>
+            <div class="clothes-grid">
+                <button type="button" class="btn-clothes" data-roupa="camiseta">Camiseta</button>
+                <button type="button" class="btn-clothes" data-roupa="jaqueta">Jaqueta</button>
+                <button type="button" class="btn-clothes" data-roupa="nenhuma">Sem Roupa</button>
+            </div>
+
+            <div class="panel-title">CHAPÉU</div>
+            <div class="clothes-grid">
+                <button type="button" class="btn-clothes" data-chapeu="bone">Boné</button>
+                <button type="button" class="btn-clothes" data-chapeu="festa">Festa</button>
+                <button type="button" class="btn-clothes" data-chapeu="nenhum">Sem Chapéu</button>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-delete" type="button" id="btnExcluir">Excluir</button>
+                <button class="btn btn-save" type="button" id="btnSalvar">Salvar</button>
+                <button class="btn btn-default" type="button" id="btnPadrao">Padrão</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="config-conta.html" class="nav-item nav-conta">Conta</a>
+        <a href="config-sistemas.html" class="nav-item nav-sistemas">Sistemas</a>
+        <a href="config-personalizacao.html" class="nav-item nav-personalizacao active">Personalização</a>
+        <a href="config-privacidade.html" class="nav-item nav-privacidade">Privacidade</a>
+    </nav>
+
+    <div class="overlay-modal" id="modalNotificacao" style="display: none;">
+        <div class="modal-box modal-success">
+            <span class="modal-close" id="fecharModalNotificacao">&times;</span>
+            <div class="modal-title" id="tituloModalNotificacao">ALTERAÇÕES SALVAS</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4c2ZwbXF3aHB2YWp6eXJhcHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4OTU0MDAsImV4cCI6MjEwMzQ3MTQwMH0.qNgFa9lbwdqEjVFM2Su4yHchR_vtl7w9QOOrPYe1wsA";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const caminhoRoupas = { 'nenhuma': '', 'camiseta': 'camisa.png', 'jaqueta': 'img/roupas/jaqueta.png' };
+        const caminhoChapeus = { 'nenhum': '', 'bone': 'chapeu.png', 'festa': 'img/chapeus/chapeu-festa.png' };
+        const email = localStorage.getItem('usuario_email') || "";
+
+        let roupaSel = 'nenhuma';
+        let chapeuSel = 'nenhum';
+        let estampaSel = 'nenhuma';
+        let cor1Sel = '#4a7bc7';
+        let cor2Sel = '#ff0000';
+        let dadosOriginais = null;
+
+        function exibirNotificacao(texto) {
+            document.getElementById('tituloModalNotificacao').innerText = texto;
+            document.getElementById('modalNotificacao').style.display = 'flex';
+        }
+
+        document.getElementById('fecharModalNotificacao').addEventListener('click', () => {
+            document.getElementById('modalNotificacao').style.display = 'none';
+        });
+
+        function atualizarAparenciaBoneco() {
+            document.getElementById('cabeca-boneco').setAttribute('fill', cor1Sel);
+            document.getElementById('corpo-boneco').setAttribute('fill', cor1Sel);
+
+            const grupoEstampas = document.getElementById('grupo-estampas');
+            grupoEstampas.innerHTML = '';
+            if (estampaSel === 'bolinhas') {
+                grupoEstampas.innerHTML = `<circle cx="80" cy="90" r="8" fill="${cor2Sel}" /><circle cx="120" cy="110" r="12" fill="${cor2Sel}" /><circle cx="95" cy="140" r="10" fill="${cor2Sel}" /><circle cx="110" cy="180" r="9" fill="${cor2Sel}" />`;
+            } else if (estampaSel === 'linhas') {
+                let l = '';
+                for (let o = -250; o < 400; o += 16) { l += `<line x1="${o + 250}" y1="0" x2="${o}" y2="280" stroke="${cor2Sel}" stroke-width="5" />`; }
+                grupoEstampas.innerHTML = l;
+            }
+
+            document.getElementById('img-roupa').setAttribute('href', caminhoRoupas[roupaSel] || '');
+            document.getElementById('img-chapeu').setAttribute('href', caminhoChapeus[chapeuSel] || '');
+        }
+
+        document.getElementById('corPrincipal').addEventListener('input', (e) => { cor1Sel = e.target.value; atualizarAparenciaBoneco(); });
+        document.getElementById('corEstampa').addEventListener('input', (e) => { cor2Sel = e.target.value; atualizarAparenciaBoneco(); });
+
+        document.querySelectorAll('[data-estampa]').forEach(btn => btn.addEventListener('click', (e) => { estampaSel = e.target.getAttribute('data-estampa'); atualizarAparenciaBoneco(); }));
+        document.querySelectorAll('[data-roupa]').forEach(btn => btn.addEventListener('click', (e) => { roupaSel = e.target.getAttribute('data-roupa'); atualizarAparenciaBoneco(); }));
+        document.querySelectorAll('[data-chapeu]').forEach(btn => btn.addEventListener('click', (e) => { chapeuSel = e.target.getAttribute('data-chapeu'); atualizarAparenciaBoneco(); }));
+
+        async function carregar() {
+            if (!email) return;
+            try {
+                const { data } = await supabaseClient.from('usuarios').select('*').eq('email', email);
+                if (data && data.length > 0) {
+                    dadosOriginais = data[0];
+                    aplicarDados(dadosOriginais);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function aplicarDados(u) {
+            document.getElementById('nomePersonagem').value = u.nome_personagem || '';
+            cor1Sel = u.cor_1 || '#4a7bc7';
+            cor2Sel = u.cor_2 || '#ff0000';
+            estampaSel = u.estampa || 'nenhuma';
+            roupaSel = u.roupa || 'nenhuma';
+            chapeuSel = u.chapeu || 'nenhum';
+
+            document.getElementById('corPrincipal').value = cor1Sel;
+            document.getElementById('corEstampa').value = cor2Sel;
+            atualizarAparenciaBoneco();
+        }
+
+        document.getElementById('btnSalvar').addEventListener('click', async () => {
+            const nomeP = document.getElementById('nomePersonagem').value;
+            try {
+                await supabaseClient.from('usuarios').update({
+                    nome_personagem: nomeP,
+                    cor_1: cor1Sel,
+                    cor_2: cor2Sel,
+                    estampa: estampaSel,
+                    roupa: roupaSel,
+                    chapeu: chapeuSel
+                }).eq('email', email);
+
+                if (dadosOriginais) {
+                    dadosOriginais.nome_personagem = nomeP;
+                    dadosOriginais.cor_1 = cor1Sel;
+                    dadosOriginais.cor_2 = cor2Sel;
+                    dadosOriginais.estampa = estampaSel;
+                    dadosOriginais.roupa = roupaSel;
+                    dadosOriginais.chapeu = chapeuSel;
+                }
+                exibirNotificacao('ALTERAÇÕES SALVAS');
+            } catch (err) {
+                exibirNotificacao('ERRO AO SALVAR ALTERAÇÕES');
+            }
+        });
+
+        document.getElementById('btnExcluir').addEventListener('click', () => { exibirNotificacao('CONTA EXCLUÍDA'); });
+        document.getElementById('btnPadrao').addEventListener('click', () => {
+            if (dadosOriginais) {
+                aplicarDados(dadosOriginais);
+                exibirNotificacao('CONFIGURAÇÕES RESTAURADAS');
+            }
+        });
+
+        carregar();
+    </script>
+</body>
+</html>

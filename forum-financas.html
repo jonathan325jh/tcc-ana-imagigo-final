@@ -66,9 +66,10 @@
     </div>
 
 <script>
-const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+    const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_4N34f8bpdw9lZ-YtGJwq-w_8gC49zeW";
 
+// Altere esta constante conforme a página HTML atual
 const CATEGORIA_PAGINA = "financas"; 
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -98,13 +99,17 @@ function exibirNotificacao(titulo, subtitulo, icone = '⚡', ehLevelUp = false) 
     `;
 
     container.appendChild(toast);
-    setTimeout(() => { fecharToast(toast); }, 7000);
+    setTimeout(() => {
+        fecharToast(toast);
+    }, 7000);
 }
 
 function fecharToast(toastElement) {
     if (!toastElement) return;
     toastElement.style.animation = 'slideOut 0.4s ease forwards';
-    setTimeout(() => { toastElement.remove(); }, 400);
+    setTimeout(() => {
+        toastElement.remove();
+    }, 400);
 }
 
 async function adicionarXP(email, quantidade, motivo) {
@@ -115,7 +120,10 @@ async function adicionarXP(email, quantidade, motivo) {
             .eq('email', email)
             .maybeSingle();
 
-        if (error || !usuario) return;
+        if (error || !usuario) {
+            console.error("Erro ao buscar usuário:", error);
+            return;
+        }
 
         let xpAtual = parseInt(usuario.xp || 0);
         let levelAtual = Math.floor(xpAtual / 100);
@@ -128,10 +136,17 @@ async function adicionarXP(email, quantidade, motivo) {
             .update({ xp: novoXp, level: novoLevel })
             .eq('email', email);
 
-        if (updateError) return;
+        if (updateError) {
+            console.error("Erro ao atualizar dados no Supabase:", updateError);
+            return;
+        }
 
-        if (usuarioAtual) usuarioAtual.level = novoLevel;
+        // Atualiza a referência em memória local do nível atual do usuário
+        if (usuarioAtual) {
+            usuarioAtual.level = novoLevel;
+        }
 
+        // Exibe notificação de ganho de XP
         exibirNotificacao(`+${quantidade} XP Conquistados!`, motivo, '⭐');
 
         if (novoLevel > levelAtual) {
@@ -140,7 +155,9 @@ async function adicionarXP(email, quantidade, motivo) {
             }, 600);
         }
 
+        // Sincroniza com a barra de progresso / outras abas abertas
         localStorage.setItem('usuario_xp_atualizado', Date.now());
+
     } catch (err) {
         console.error("Erro ao processar adição de XP:", err);
     }
@@ -154,8 +171,11 @@ function formatarData(dataIso) {
     if (!dataIso) return '';
     const data = new Date(dataIso);
     return data.toLocaleString('pt-BR', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 }
 
@@ -170,7 +190,9 @@ async function carregarUsuarioAtual() {
 
     if (!email) {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session && session.user) email = session.user.email;
+        if (session && session.user) {
+            email = session.user.email;
+        }
     }
 
     if (!email) {
@@ -186,14 +208,20 @@ async function carregarUsuarioAtual() {
 
     if (usuario) {
         const xp = Number(usuario.xp) || 0;
+        const levelCalculado = Math.floor(xp / 100);
         usuarioAtual = {
             nome: usuario.nome_personagem || usuario.nome || email.split('@')[0],
             email: email,
-            level: Math.floor(xp / 100)
+            level: levelCalculado
         };
     } else {
-        usuarioAtual = { nome: email.split('@')[0], email: email, level: 0 };
+        usuarioAtual = {
+            nome: email.split('@')[0],
+            email: email,
+            level: 0
+        };
     }
+
     return true;
 }
 
@@ -202,18 +230,35 @@ async function carregarUsuarios() {
         .from('usuarios')
         .select('nome, nome_personagem, email, xp, level');
 
-    if (error) return;
+    if (error) {
+        console.error("Erro ao carregar usuários:", error);
+        return;
+    }
 
     usuariosCache = {};
+
     if (data) {
         data.forEach(usuario => {
             const xp = Number(usuario.xp) || 0;
             const levelCalculado = Math.floor(xp / 100);
-            const nome = usuario.nome_personagem || usuario.nome || 'Usuário';
+            const nomeExibicao = usuario.nome_personagem || usuario.nome || 'Usuário';
 
-            const obj = { nome: nome, level: levelCalculado, email: usuario.email };
-            usuariosCache[nome] = obj;
-            if (usuario.email) usuariosCache[usuario.email] = obj;
+            const objetoUsuario = {
+                nome: nomeExibicao,
+                level: levelCalculado,
+                email: usuario.email
+            };
+
+            // Mapeia por e-mail e por variações de nome para evitar perdas
+            if (usuario.email) {
+                usuariosCache[usuario.email] = objetoUsuario;
+            }
+            if (nomeExibicao) {
+                usuariosCache[nomeExibicao] = objetoUsuario;
+            }
+            if (usuario.nome) {
+                usuariosCache[usuario.nome] = objetoUsuario;
+            }
         });
     }
 }
@@ -228,6 +273,7 @@ async function carregarPosts() {
         .order('id', { ascending: false });
 
     if (error) {
+        console.error(error);
         lista.innerHTML = '<p>Erro ao carregar as publicações.</p>';
         return;
     }
@@ -238,13 +284,18 @@ async function carregarPosts() {
     }
 
     lista.innerHTML = '';
+
     for (const post of posts) {
         await criarPost(post, lista);
     }
 }
 
 async function criarPost(post, lista) {
-    const usuario = usuariosCache[post.usuario_nome] || { nome: post.usuario_nome || 'Usuário', level: 0 };
+    // Busca o usuário no cache priorizando E-mail, depois Nome
+    const usuario = usuariosCache[post.usuario_email] || usuariosCache[post.usuario_nome] || {
+        nome: post.usuario_nome || 'Usuário',
+        level: 0
+    };
 
     const { data: reacoes } = await supabaseClient
         .from('post_reacoes')
@@ -255,12 +306,18 @@ async function criarPost(post, lista) {
     const naoCurtidas = (reacoes || []).filter(r => r.tipo === 'nao_curti').length;
 
     let minhaReacao = null;
+
     if (usuarioAtual) {
         const reacaoUsuario = (reacoes || []).find(r => r.usuario_email === usuarioAtual.email);
-        if (reacaoUsuario) minhaReacao = reacaoUsuario.tipo;
+        if (reacaoUsuario) {
+            minhaReacao = reacaoUsuario.tipo;
+        }
     }
 
-    const ehAutor = usuarioAtual && (usuarioAtual.email === post.usuario_email || usuarioAtual.nome === post.usuario_nome);
+    const ehAutor = usuarioAtual && (
+        usuarioAtual.email === post.usuario_email ||
+        usuarioAtual.nome === post.usuario_nome
+    );
 
     const card = document.createElement('div');
     card.className = 'card-post';
@@ -317,16 +374,42 @@ async function reagir(postId, tipo) {
 
     if (existente) {
         if (existente.tipo === tipo) {
-            await supabaseClient.from('post_reacoes').delete().eq('id', existente.id);
+            const { error } = await supabaseClient
+                .from('post_reacoes')
+                .delete()
+                .eq('id', existente.id);
+
+            if (error) {
+                console.error(error);
+                alert('Erro ao remover reação.');
+                return;
+            }
         } else {
-            await supabaseClient.from('post_reacoes').update({ tipo: tipo }).eq('id', existente.id);
+            const { error } = await supabaseClient
+                .from('post_reacoes')
+                .update({ tipo: tipo })
+                .eq('id', existente.id);
+
+            if (error) {
+                console.error(error);
+                alert('Erro ao alterar reação.');
+                return;
+            }
         }
     } else {
-        await supabaseClient.from('post_reacoes').insert({
-            post_id: postId,
-            usuario_email: usuarioAtual.email,
-            tipo: tipo
-        });
+        const { error } = await supabaseClient
+            .from('post_reacoes')
+            .insert({
+                post_id: postId,
+                usuario_email: usuarioAtual.email,
+                tipo: tipo
+            });
+
+        if (error) {
+            console.error(error);
+            alert('Erro ao registrar reação.');
+            return;
+        }
     }
 
     carregarPosts();
@@ -337,7 +420,10 @@ async function abrirComentarios(postId) {
     if (!area) return;
 
     area.classList.toggle('aberto');
-    if (area.classList.contains('aberto')) await carregarComentarios(postId);
+
+    if (area.classList.contains('aberto')) {
+        await carregarComentarios(postId);
+    }
 }
 
 async function carregarComentarios(postId) {
@@ -350,6 +436,7 @@ async function carregarComentarios(postId) {
         .order('id', { ascending: true });
 
     if (error) {
+        console.error(error);
         lista.innerHTML = 'Erro ao carregar comentários.';
         return;
     }
@@ -360,8 +447,14 @@ async function carregarComentarios(postId) {
     }
 
     lista.innerHTML = '';
+
     comentarios.forEach(comentario => {
-        const usuario = usuariosCache[comentario.usuario_nome] || { nome: comentario.usuario_nome || 'Usuário', level: 0 };
+        // Busca o autor do comentário priorizando E-mail, depois Nome
+        const usuario = usuariosCache[comentario.usuario_email] || usuariosCache[comentario.usuario_nome] || {
+            nome: comentario.usuario_nome || 'Usuário',
+            level: 0
+        };
+
         const div = document.createElement('div');
         div.className = 'comentario';
 
@@ -400,17 +493,31 @@ async function enviarComentario(event, postId) {
             mensagem: mensagem
         });
 
-    if (error) return;
+    if (error) {
+        console.error(error);
+        alert('Erro ao enviar comentário.');
+        return;
+    }
 
     input.value = '';
     await carregarComentarios(postId);
 }
 
 async function apagarPost(id) {
-    if (!confirm('Tem certeza que deseja apagar esta publicação?')) return;
+    if (!confirm('Tem certeza que deseja apagar esta publicação?')) {
+        return;
+    }
 
-    const { error } = await supabaseClient.from('posts').delete().eq('id', id);
-    if (error) return;
+    const { error } = await supabaseClient
+        .from('posts')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        alert('Erro ao apagar publicação.');
+        return;
+    }
 
     carregarPosts();
 }
@@ -438,6 +545,7 @@ async function publicar() {
         });
 
     if (error) {
+        console.error(error);
         alert('Erro ao publicar a mensagem: ' + error.message);
         botao.disabled = false;
         botao.textContent = 'POSTAR';
@@ -452,7 +560,7 @@ async function publicar() {
     botao.disabled = false;
     botao.textContent = 'POSTAR';
 
-    // ATRIBUIÇÃO DE XP E NOTIFICAÇÃO
+    // ADICIONA +5 XP AO USUÁRIO SEMPRE QUE POSTAR
     await adicionarXP(usuarioAtual.email, 5, 'Por criar uma nova publicação no fórum!');
 
     await carregarUsuarios();
@@ -460,12 +568,16 @@ async function publicar() {
 }
 
 function ativarCompartilhar() {
-    document.querySelector('.compartilhar-area').classList.add('aberto');
-    document.getElementById('areaPublicar').classList.add('ativo');
+    const area = document.querySelector('.compartilhar-area');
+    const publicar = document.getElementById('areaPublicar');
+
+    area.classList.add('aberto');
+    publicar.classList.add('ativo');
 }
 
 document.getElementById('searchInput').addEventListener('input', function () {
     const termo = this.value.toLowerCase().trim();
+
     document.querySelectorAll('.card-post').forEach(card => {
         const texto = card.innerText.toLowerCase();
         card.style.display = texto.includes(termo) ? '' : 'none';
@@ -480,6 +592,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await carregarPosts();
 
     const mensagemTextarea = document.getElementById('mensagem');
+
     mensagemTextarea.addEventListener('focus', ativarCompartilhar);
 
     document.getElementById('compartilharCampo').addEventListener('click', () => {

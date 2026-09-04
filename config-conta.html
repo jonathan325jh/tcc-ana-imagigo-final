@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Conta</title>
+    <link rel="stylesheet" href="config.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar com o Personagem -->
+        <div class="sidebar">
+            <div class="boneco-area-sidebar">
+                <svg id="boneco-principal" class="boneco-flutuante" width="180" height="250" viewBox="0 0 200 280">
+                    <defs>
+                        <clipPath id="recorte-corpo-sidebar">
+                            <path d="M 100,60 C 75,60 62,72 44,100 C 35,114 47,128 55,115 C 65,99 71,90 76,94 C 73,115 67,155 62,215 C 60,228 76,228 78,215 C 84,175 92,142 100,142 C 108,142 116,175 122,215 C 124,228 140,228 138,215 C 133,155 127,115 124,94 C 129,90 135,99 145,115 C 153,128 165,114 156,100 C 138,72 125,60 100,60 Z" />
+                        </clipPath>
+                    </defs>
+                    <g id="elementos-fundo-svg"></g>
+                    <circle id="cabeca-boneco" cx="100" cy="40" r="18" fill="#4a7bc7" />
+                    <path id="corpo-boneco" d="M 100,60 C 75,60 62,72 44,100 C 35,114 47,128 55,115 C 65,99 71,90 76,94 C 73,115 67,155 62,215 C 60,228 76,228 78,215 C 84,175 92,142 100,142 C 108,142 116,175 122,215 C 124,228 140,228 138,215 C 133,155 127,115 124,94 C 129,90 135,99 145,115 C 153,128 165,114 156,100 C 138,72 125,60 100,60 Z" fill="#4a7bc7" />
+                    <g clip-path="url(#recorte-corpo-sidebar)" id="grupo-estampas"></g>
+                    <image id="img-roupa" x="33" y="35" width="140" height="170" href="" />
+                    <image id="img-chapeu" x="70" y="2" width="60" height="46" href="" />
+                </svg>
+                <div class="sombra-boneco"></div>
+            </div>
+        </div>
+
+        <div class="content-panel">
+            <div class="panel-title">DADOS DA CONTA</div>
+            <div class="input-group">
+                <input type="text" id="nomeUsuario" class="input-field" placeholder="Nome do Usuário">
+            </div>
+            <div class="input-group">
+                <input type="email" id="emailUsuario" class="input-field" placeholder="E-mail">
+            </div>
+
+            <div class="panel-title" style="margin-top: 15px;">SEGURANÇA</div>
+            <div class="input-group">
+                <input type="password" id="senhaAtual" class="input-field" placeholder="Senha Atual">
+            </div>
+            <div class="input-group">
+                <input type="password" id="novaSenha" class="input-field" placeholder="Nova Senha">
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-delete" type="button" id="btnExcluir">Excluir</button>
+                <button class="btn btn-save" type="button" id="btnSalvar">Salvar</button>
+                <button class="btn btn-default" type="button" id="btnPadrao">Padrão</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="config-conta.html" class="nav-item nav-conta">Conta</a>
+        <a href="config-sistemas.html" class="nav-item nav-sistemas">Sistemas</a>
+        <a href="config-personalizacao.html" class="nav-item nav-personalizacao">Personalização</a>
+        <a href="config-privacidade.html" class="nav-item nav-privacidade">Privacidade</a>
+    </nav>
+
+    <!-- Modal de Notificação na própria página -->
+    <div class="overlay-modal" id="modalNotificacao" style="display: none;">
+        <div class="modal-box modal-success">
+            <span class="modal-close" id="fecharModalNotificacao">&times;</span>
+            <div class="modal-title" id="tituloModalNotificacao">ALTERAÇÕES SALVAS</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4c2ZwbXF3aHB2YWp6eXJhcHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4OTU0MDAsImV4cCI6MjEwMzQ3MTQwMH0.qNgFa9lbwdqEjVFM2Su4yHchR_vtl7w9QOOrPYe1wsA";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const caminhoRoupas = { 'nenhuma': '', 'camiseta': 'camisa.png', 'jaqueta': 'img/roupas/jaqueta.png' };
+        const caminhoChapeus = { 'nenhum': '', 'bone': 'chapeu.png', 'festa': 'img/chapeus/chapeu-festa.png' };
+        
+        // Pega o e-mail do localStorage garantindo remoção de espaços e caixa baixa
+        let emailSessao = (localStorage.getItem('usuario_email') || "").trim().toLowerCase();
+
+        // Função utilitária para exibir a notificação
+        function exibirNotificacao(texto) {
+            document.getElementById('tituloModalNotificacao').innerText = texto;
+            document.getElementById('modalNotificacao').style.display = 'flex';
+        }
+
+        // Fechar o modal ao clicar no 'X'
+        document.getElementById('fecharModalNotificacao').addEventListener('click', () => {
+            document.getElementById('modalNotificacao').style.display = 'none';
+        });
+
+        async function carregar() {
+            if (!emailSessao) {
+                console.warn("Nenhum e-mail encontrado no localStorage.");
+                return;
+            }
+            try {
+                const { data, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('email', emailSessao);
+
+                if (error) {
+                    console.error("Erro na busca inicial:", error);
+                    return;
+                }
+
+                if (data && data.length > 0) {
+                    const u = data[0];
+                    document.getElementById('nomeUsuario').value = u.nome || '';
+                    document.getElementById('emailUsuario').value = u.email || '';
+
+                    document.getElementById('cabeca-boneco').setAttribute('fill', u.cor_1 || '#4a7bc7');
+                    document.getElementById('corpo-boneco').setAttribute('fill', u.cor_1 || '#4a7bc7');
+
+                    const grupoEstampas = document.getElementById('grupo-estampas');
+                    grupoEstampas.innerHTML = '';
+                    if (u.estampa === 'bolinhas') {
+                        grupoEstampas.innerHTML = `<circle cx="80" cy="90" r="8" fill="${u.cor_2 || '#ff0000'}" /><circle cx="120" cy="110" r="12" fill="${u.cor_2 || '#ff0000'}" /><circle cx="95" cy="140" r="10" fill="${u.cor_2 || '#ff0000'}" /><circle cx="110" cy="180" r="9" fill="${u.cor_2 || '#ff0000'}" />`;
+                    } else if (u.estampa === 'linhas') {
+                        let l = '';
+                        for (let o = -250; o < 400; o += 16) { l += `<line x1="${o + 250}" y1="0" x2="${o}" y2="280" stroke="${u.cor_2 || '#ff0000'}" stroke-width="5" />`; }
+                        grupoEstampas.innerHTML = l;
+                    }
+
+                    document.getElementById('img-roupa').setAttribute('href', caminhoRoupas[u.roupa] || '');
+                    document.getElementById('img-chapeu').setAttribute('href', caminhoChapeus[u.chapeu] || '');
+                }
+            } catch (err) { 
+                console.error("Erro ao carregar dados:", err); 
+            }
+        }
+
+        // Botão Salvar
+        document.getElementById('btnSalvar').addEventListener('click', async () => {
+            const novoNome = document.getElementById('nomeUsuario').value;
+            const novoEmail = document.getElementById('emailUsuario').value.trim().toLowerCase();
+            const senhaAtual = document.getElementById('senhaAtual').value;
+            const novaSenha = document.getElementById('novaSenha').value;
+
+            if (!emailSessao) {
+                exibirNotificacao('SESSÃO EXPIRADA, FAÇA LOGIN NOVAMENTE');
+                return;
+            }
+
+            try {
+                // 1. Busca os dados atuais do usuário usando array simples em vez de .single()
+                const { data: resultados, error: fetchError } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('email', emailSessao);
+
+                if (fetchError || !resultados || resultados.length === 0) {
+                    console.error("E-mail buscado:", emailSessao, "Erro:", fetchError);
+                    exibirNotificacao('USUÁRIO NÃO ENCONTRADO');
+                    return;
+                }
+
+                const usuarioData = resultados[0];
+                const atualizacao = {
+                    nome: novoNome,
+                    email: novoEmail
+                };
+
+                // 2. Valida a alteração de senha caso informada
+                if (novaSenha.trim() !== '') {
+                    if (!senhaAtual.trim()) {
+                        exibirNotificacao('DIGITE A SENHA ATUAL PARA ALTERAR A SENHA');
+                        return;
+                    }
+
+                    if (usuarioData.senha && usuarioData.senha !== senhaAtual) {
+                        exibirNotificacao('SENHA ATUAL INCORRETA');
+                        return;
+                    }
+
+                    if (novaSenha.length < 6) {
+                        exibirNotificacao('A NOVA SENHA DEVE TER NO MÍNIMO 6 CARACTERES');
+                        return;
+                    }
+
+                    atualizacao.senha = novaSenha;
+                }
+
+                // 3. Atualiza os dados na tabela 'usuarios'
+                const { error: updateError } = await supabaseClient
+                    .from('usuarios')
+                    .update(atualizacao)
+                    .eq('email', emailSessao);
+
+                if (updateError) {
+                    console.error("Erro ao salvar dados:", updateError);
+                    exibirNotificacao('ERRO AO SALVAR ALTERAÇÕES');
+                    return;
+                }
+
+                if (novoEmail !== emailSessao) {
+                    localStorage.setItem('usuario_email', novoEmail);
+                    emailSessao = novoEmail;
+                }
+
+                document.getElementById('senhaAtual').value = '';
+                document.getElementById('novaSenha').value = '';
+
+                exibirNotificacao('ALTERAÇÕES SALVAS COM SUCESSO');
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+
+            } catch (err) {
+                console.error("Erro geral:", err);
+                exibirNotificacao('ERRO AO SALVAR ALTERAÇÕES');
+            }
+        });
+
+        // Botão Excluir
+        document.getElementById('btnExcluir').addEventListener('click', async () => {
+            if (!emailSessao) {
+                exibirNotificacao('SESSÃO EXPIRADA');
+                return;
+            }
+
+            if (!confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('usuarios')
+                    .delete()
+                    .eq('email', emailSessao);
+
+                if (error) {
+                    exibirNotificacao('ERRO AO EXCLUIR CONTA');
+                    return;
+                }
+
+                localStorage.removeItem('usuario_email');
+                exibirNotificacao('CONTA EXCLUÍDA COM SUCESSO');
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            } catch (err) {
+                console.error("Erro ao excluir:", err);
+                exibirNotificacao('ERRO AO EXCLUIR CONTA');
+            }
+        });
+
+        // Botão Padrão
+        document.getElementById('btnPadrao').addEventListener('click', () => {
+            document.getElementById('senhaAtual').value = '';
+            document.getElementById('novaSenha').value = '';
+            carregar();
+            exibirNotificacao('CONFIGURAÇÕES RESTAURADAS AO PADRÃO');
+        });
+
+        carregar();
+    </script>
+</body>
+</html>

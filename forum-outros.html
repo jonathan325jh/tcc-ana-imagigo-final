@@ -76,15 +76,20 @@
     </div>
 
 <script>
-const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+    const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_4N34f8bpdw9lZ-YtGJwq-w_8gC49zeW";
 
+// Altere esta constante conforme a página HTML atual
 const CATEGORIA_PAGINA = "outros"; 
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let usuarioAtual = null;
 let usuariosCache = {};
+
+/* =========================================
+   FUNÇÕES DE TOAST E XP
+========================================= */
 
 function exibirNotificacao(titulo, subtitulo, icone = '⚡', ehLevelUp = false) {
     const container = document.getElementById('container-notificacao');
@@ -146,10 +151,12 @@ async function adicionarXP(email, quantidade, motivo) {
             return;
         }
 
+        // Atualiza a referência em memória local do nível atual do usuário
         if (usuarioAtual) {
             usuarioAtual.level = novoLevel;
         }
 
+        // Exibe notificação de ganho de XP
         exibirNotificacao(`+${quantidade} XP Conquistados!`, motivo, '⭐');
 
         if (novoLevel > levelAtual) {
@@ -158,12 +165,17 @@ async function adicionarXP(email, quantidade, motivo) {
             }, 600);
         }
 
+        // Sincroniza com a barra de progresso / outras abas abertas
         localStorage.setItem('usuario_xp_atualizado', Date.now());
 
     } catch (err) {
         console.error("Erro ao processar adição de XP:", err);
     }
 }
+
+/* =========================================
+   FUNÇÕES DO FÓRUM
+========================================= */
 
 function formatarData(dataIso) {
     if (!dataIso) return '';
@@ -229,7 +241,7 @@ async function carregarUsuarios() {
         .select('nome, nome_personagem, email, xp, level');
 
     if (error) {
-        console.error(error);
+        console.error("Erro ao carregar usuários:", error);
         return;
     }
 
@@ -239,20 +251,23 @@ async function carregarUsuarios() {
         data.forEach(usuario => {
             const xp = Number(usuario.xp) || 0;
             const levelCalculado = Math.floor(xp / 100);
-            const nome = usuario.nome_personagem || usuario.nome || 'Usuário';
+            const nomeExibicao = usuario.nome_personagem || usuario.nome || 'Usuário';
 
-            usuariosCache[nome] = {
-                nome: nome,
+            const objetoUsuario = {
+                nome: nomeExibicao,
                 level: levelCalculado,
                 email: usuario.email
             };
 
+            // Mapeia por e-mail e por variações de nome para evitar perdas
             if (usuario.email) {
-                usuariosCache[usuario.email] = {
-                    nome: nome,
-                    level: levelCalculado,
-                    email: usuario.email
-                };
+                usuariosCache[usuario.email] = objetoUsuario;
+            }
+            if (nomeExibicao) {
+                usuariosCache[nomeExibicao] = objetoUsuario;
+            }
+            if (usuario.nome) {
+                usuariosCache[usuario.nome] = objetoUsuario;
             }
         });
     }
@@ -286,7 +301,8 @@ async function carregarPosts() {
 }
 
 async function criarPost(post, lista) {
-    const usuario = usuariosCache[post.usuario_nome] || {
+    // Busca o usuário no cache priorizando E-mail, depois Nome
+    const usuario = usuariosCache[post.usuario_email] || usuariosCache[post.usuario_nome] || {
         nome: post.usuario_nome || 'Usuário',
         level: 0
     };
@@ -443,7 +459,8 @@ async function carregarComentarios(postId) {
     lista.innerHTML = '';
 
     comentarios.forEach(comentario => {
-        const usuario = usuariosCache[comentario.usuario_nome] || {
+        // Busca o autor do comentário priorizando E-mail, depois Nome
+        const usuario = usuariosCache[comentario.usuario_email] || usuariosCache[comentario.usuario_nome] || {
             nome: comentario.usuario_nome || 'Usuário',
             level: 0
         };
@@ -553,6 +570,7 @@ async function publicar() {
     botao.disabled = false;
     botao.textContent = 'POSTAR';
 
+    // ADICIONA +5 XP AO USUÁRIO SEMPRE QUE POSTAR
     await adicionarXP(usuarioAtual.email, 5, 'Por criar uma nova publicação no fórum!');
 
     await carregarUsuarios();
@@ -597,12 +615,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             publicar();
-        }
-    });
-
-    window.addEventListener('storage', (event) => {
-        if (event.key === 'usuario_xp_atualizado') {
-            carregarUsuarioAtual();
         }
     });
 });

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Privacidade</title>
+    <link rel="stylesheet" href="config.css">
+    <style>
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            color: #fff;
+            font-size: 14px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input { display: none; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            transition: .3s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #4a7bc7; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Estilos dos botões de termos e concordância */
+        .btn-doc {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-doc:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-consent {
+            width: 100%;
+            padding: 12px;
+            background-color: transparent;
+            border: 2px solid #4a7bc7;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-consent.aceito {
+            background-color: #4a7bc7;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="boneco-area-sidebar">
+                <svg id="boneco-principal" class="boneco-flutuante" width="180" height="250" viewBox="0 0 200 280">
+                    <defs>
+                        <clipPath id="recorte-corpo-sidebar">
+                            <path d="M 100,60 C 75,60 62,72 44,100 C 35,114 47,128 55,115 C 65,99 71,90 76,94 C 73,115 67,155 62,215 C 60,228 76,228 78,215 C 84,175 92,142 100,142 C 108,142 116,175 122,215 C 124,228 140,228 138,215 C 133,155 127,115 124,94 C 129,90 135,99 145,115 C 153,128 165,114 156,100 C 138,72 125,60 100,60 Z" />
+                        </clipPath>
+                    </defs>
+                    <g id="elementos-fundo-svg"></g>
+                    <circle id="cabeca-boneco" cx="100" cy="40" r="18" fill="#4a7bc7" />
+                    <path id="corpo-boneco" d="M 100,60 C 75,60 62,72 44,100 C 35,114 47,128 55,115 C 65,99 71,90 76,94 C 73,115 67,155 62,215 C 60,228 76,228 78,215 C 84,175 92,142 100,142 C 108,142 116,175 122,215 C 124,228 140,228 138,215 C 133,155 127,115 124,94 C 129,90 135,99 145,115 C 153,128 165,114 156,100 C 138,72 125,60 100,60 Z" fill="#4a7bc7" />
+                    <g clip-path="url(#recorte-corpo-sidebar)" id="grupo-estampas"></g>
+                    <image id="img-roupa" x="33" y="35" width="140" height="170" href="" />
+                    <image id="img-chapeu" x="70" y="2" width="60" height="46" href="" />
+                </svg>
+                <div class="sombra-boneco"></div>
+            </div>
+        </div>
+
+        <div class="content-panel">
+            <div class="panel-title">DOCUMENTOS E TERMOS</div>
+            
+            <div class="input-group">
+                <button type="button" class="btn btn-doc" id="btnTermos">Termos de Uso</button>
+                <button type="button" class="btn btn-doc" id="btnPoliticas" style="margin-top: 8px;">Políticas de Uso</button>
+            </div>
+
+            <div class="consent-group" style="margin-top: 15px;">
+                <button type="button" class="btn btn-consent" id="btnAceitarTermos">
+                    Li os termos de uso e políticas de uso e concordo
+                </button>
+            </div>
+
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="btn btn-delete" type="button" id="btnExcluir">Excluir</button>
+                <button class="btn btn-save" type="button" id="btnSalvar">Salvar</button>
+                <button class="btn btn-default" type="button" id="btnPadrao">Padrão</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="config-conta.html" class="nav-item nav-conta">Conta</a>
+        <a href="config-sistemas.html" class="nav-item nav-sistemas">Sistemas</a>
+        <a href="config-personalizacao.html" class="nav-item nav-personalizacao">Personalização</a>
+        <a href="config-privacidade.html" class="nav-item nav-privacidade active">Privacidade</a>
+    </nav>
+
+    <div class="overlay-modal" id="modalNotificacao" style="display: none;">
+        <div class="modal-box modal-success">
+            <span class="modal-close" id="fecharModalNotificacao">&times;</span>
+            <div class="modal-title" id="tituloModalNotificacao">ALTERAÇÕES SALVAS</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://yxsfpmqwhpvajzyrapyi.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4c2ZwbXF3aHB2YWp6eXJhcHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc4OTU0MDAsImV4cCI6MjEwMzQ3MTQwMH0.qNgFa9lbwdqEjVFM2Su4yHchR_vtl7w9QOOrPYe1wsA";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const caminhoRoupas = { 'nenhuma': '', 'camiseta': 'camisa.png', 'jaqueta': 'img/roupas/jaqueta.png' };
+        const caminhoChapeus = { 'nenhum': '', 'bone': 'chapeu.png', 'festa': 'img/chapeus/chapeu-festa.png' };
+        const email = localStorage.getItem('usuario_email') || "";
+
+        let dadosOriginais = null;
+        let termosAceitos = false;
+
+        function exibirNotificacao(texto) {
+            document.getElementById('tituloModalNotificacao').innerText = texto;
+            document.getElementById('modalNotificacao').style.display = 'flex';
+        }
+
+        document.getElementById('fecharModalNotificacao').addEventListener('click', () => {
+            document.getElementById('modalNotificacao').style.display = 'none';
+        });
+
+        // Evento de clique para aceitar os termos
+        document.getElementById('btnAceitarTermos').addEventListener('click', function() {
+            termosAceitos = !termosAceitos;
+            
+            if (termosAceitos) {
+                this.classList.add('aceito');
+                this.innerText = '✓ Termos e Políticas aceitos';
+            } else {
+                this.classList.remove('aceito');
+                this.innerText = 'Li os termos de uso e políticas de uso e concordo';
+            }
+        });
+
+        // Eventos dos botões de documentos
+        document.getElementById('btnTermos').addEventListener('click', () => {
+            exibirNotificacao('ABRINDO TERMOS DE USO');
+        });
+
+        document.getElementById('btnPoliticas').addEventListener('click', () => {
+            exibirNotificacao('ABRINDO POLÍTICAS DE USO');
+        });
+
+        async function carregar() {
+            if (!email) return;
+            try {
+                const { data } = await supabaseClient.from('usuarios').select('*').eq('email', email);
+                if (data && data.length > 0) {
+                    dadosOriginais = data[0];
+                    aplicarDados(dadosOriginais);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function aplicarDados(u) {
+            document.getElementById('cabeca-boneco').setAttribute('fill', u.cor_1 || '#4a7bc7');
+            document.getElementById('corpo-boneco').setAttribute('fill', u.cor_1 || '#4a7bc7');
+
+            const grupoEstampas = document.getElementById('grupo-estampas');
+            grupoEstampas.innerHTML = '';
+            if (u.estampa === 'bolinhas') {
+                grupoEstampas.innerHTML = `<circle cx="80" cy="90" r="8" fill="${u.cor_2 || '#ff0000'}" /><circle cx="120" cy="110" r="12" fill="${u.cor_2 || '#ff0000'}" /><circle cx="95" cy="140" r="10" fill="${u.cor_2 || '#ff0000'}" /><circle cx="110" cy="180" r="9" fill="${u.cor_2 || '#ff0000'}" />`;
+            } else if (u.estampa === 'linhas') {
+                let l = '';
+                for (let o = -250; o < 400; o += 16) { l += `<line x1="${o + 250}" y1="0" x2="${o}" y2="280" stroke="${u.cor_2 || '#ff0000'}" stroke-width="5" />`; }
+                grupoEstampas.innerHTML = l;
+            }
+
+            document.getElementById('img-roupa').setAttribute('href', caminhoRoupas[u.roupa] || '');
+            document.getElementById('img-chapeu').setAttribute('href', caminhoChapeus[u.chapeu] || '');
+        }
+
+        document.getElementById('btnSalvar').addEventListener('click', () => {
+            exibirNotificacao('ALTERAÇÕES SALVAS');
+        });
+
+        document.getElementById('btnExcluir').addEventListener('click', () => {
+            exibirNotificacao('CONTA EXCLUÍDA');
+        });
+
+        document.getElementById('btnPadrao').addEventListener('click', () => {
+            if (dadosOriginais) {
+                aplicarDados(dadosOriginais);
+                
+                // Reseta o estado do botão de concordância
+                termosAceitos = false;
+                const btnConsent = document.getElementById('btnAceitarTermos');
+                btnConsent.classList.remove('aceito');
+                btnConsent.innerText = 'Li os termos de uso e políticas de uso e concordo';
+
+                exibirNotificacao('CONFIGURAÇÕES RESTAURADAS');
+            }
+        });
+
+        carregar();
+    </script>
+</body>
+</html>

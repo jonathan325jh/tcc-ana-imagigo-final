@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script src="https://kit.fontawesome.com/9ed48bdc42.js" crossorigin="anonymous"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gastos Mensais</title>
@@ -9,8 +10,158 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <link rel="stylesheet" href="gestao.css">
+  <style>
+    /* ----- ESTILOS DA NOTIFICAÇÃO E XP (VINDOS DO CONSERTO.HTML) ----- */
+    #container-notificacao {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 350px;
+      width: calc(100% - 40px);
+      pointer-events: none;
+    }
+
+    .toast-xp {
+      pointer-events: auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #ffffff;
+      color: #2b2b2b;
+      padding: 14px 18px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      border: 2px solid #28a745;
+      overflow: hidden;
+      transform: translateX(120%);
+      animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .toast-icone {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #28a745;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .toast-conteudo {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toast-titulo {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 2px;
+    }
+
+    .toast-subtitulo {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .toast-level {
+      border-color: #fb8500;
+    }
+
+    .toast-level .toast-icone {
+      background: #fb8500;
+    }
+
+    .toast-fechar {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .toast-barra-progresso {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: #28a745;
+      width: 100%;
+      animation: encolherBarra 7s linear forwards;
+    }
+
+    .toast-level .toast-barra-progresso {
+      background: #fb8500;
+    }
+
+    @keyframes slideIn {
+      to { transform: translateX(0); }
+    }
+
+    @keyframes slideOut {
+      to { transform: translateX(130%); opacity: 0; }
+    }
+
+    @keyframes encolherBarra {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    /* ----- OUTROS ESTILOS DA PÁGINA ----- */
+    .btn-delete {
+      background: transparent;
+      border: none;
+      color: #ff5252;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .btn-delete:hover {
+      color: #d32f2f;
+    }
+    .category-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .categories-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn-remove-entrada {
+      background-color: #ff9800;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      height: 5vh;
+      border: 4px solid #e68a00;
+      font-weight: bold;
+    }
+    .btn-remove-entrada:hover {
+      background-color: #fac26f;
+      border: 4px solid #e2931d;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- Container onde as notificações flutuantes serão renderizadas -->
+  <div id="container-notificacao"></div>
 
   <div class="app-container">
     <div class="voltar">
@@ -41,15 +192,18 @@
     </div>
 
     <div class="management-box">
+      <!-- Entrada / Renda -->
       <div class="input-row">
         <div class="color-btn">
           <input type="color" id="corEntrada" value="#29b6f6">
         </div>
         <input type="number" id="valorEntrada" placeholder="Digite a quantia (R$) entrada">
         <input type="text" id="nomeEntrada" placeholder="Digite o nome da entrada">
-        <button class="btn-add" onclick="adicionarRenda()">ADICIONAR</button>
+        <button class="btn-add" onclick="adicionarRenda(true)">ADICIONAR</button>
+        <button class="btn-remove-entrada" onclick="adicionarRenda(false)">SUBTRAIR</button>
       </div>
 
+      <!-- Despesa -->
       <div class="input-row">
         <div class="color-btn">
           <input type="color" id="corDespesa" value="#ef5350">
@@ -59,6 +213,7 @@
         <button class="btn-add" onclick="adicionarDespesa()">ADICIONAR</button>
       </div>
 
+      <!-- Metas -->
       <div class="goals-section">
         <div class="goals-title">Metas</div>
         <div class="goals-content">
@@ -69,6 +224,8 @@
             <input type="number" id="metaValor">
             <label>Início</label>
             <input type="date" id="metaInicio">
+            <label>Fim</label>
+            <input type="date" id="metaFim">
             <button class="btn-add" style="margin-top:5px;" onclick="adicionarMeta()">ADICIONAR</button>
           </div>
 
@@ -111,7 +268,111 @@
       return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
+    /* ----- SISTEMA DE NOTIFICAÇÃO E ADIÇÃO DE XP ----- */
+    function exibirNotificacao(titulo, subtitulo, icone = '⚡', ehLevelUp = false) {
+      const container = document.getElementById('container-notificacao');
+      if (!container) return;
+      
+      const toast = document.createElement('div');
+      toast.className = `toast-xp ${ehLevelUp ? 'toast-level' : ''}`;
+      
+      toast.innerHTML = `
+        <div class="toast-icone">${icone}</div>
+        <div class="toast-conteudo">
+          <span class="toast-titulo">${titulo}</span>
+          <span class="toast-subtitulo">${subtitulo}</span>
+        </div>
+        <button class="toast-fechar" onclick="fecharToast(this.parentElement)">&times;</button>
+        <div class="toast-barra-progresso"></div>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        fecharToast(toast);
+      }, 7000);
+    }
+
+    function fecharToast(toastElement) {
+      if (!toastElement) return;
+      toastElement.style.animation = 'slideOut 0.4s ease forwards';
+      setTimeout(() => {
+        toastElement.remove();
+      }, 400);
+    }
+
+    async function adicionarXP(quantidade, motivo) {
+      try {
+        let emailSalvo = localStorage.getItem('usuario_email');
+
+        if (!emailSalvo) {
+          const { data: { session } } = await _supabase.auth.getSession();
+          if (session && session.user) {
+            emailSalvo = session.user.email;
+          }
+        }
+
+        if (!emailSalvo) {
+          // Se não houver email cadastrado/logado, exibe a notificação localmente
+          exibirNotificacao(`+${quantidade} XP Conquistados!`, motivo, '⭐');
+          return;
+        }
+
+        const { data: usuario, error } = await _supabase
+          .from('usuarios')
+          .select('xp, level')
+          .eq('email', emailSalvo)
+          .maybeSingle();
+
+        if (error || !usuario) {
+          console.error("Erro ao buscar usuário para XP:", error);
+          exibirNotificacao(`+${quantidade} XP Conquistados!`, motivo, '⭐');
+          return;
+        }
+
+        let xpAtual = parseInt(usuario.xp || 0);
+        let levelAtual = Math.floor(xpAtual / 100);
+        
+        let novoXp = xpAtual + quantidade;
+        let novoLevel = Math.floor(novoXp / 100);
+
+        const { error: updateError } = await _supabase
+          .from('usuarios')
+          .update({ xp: novoXp, level: novoLevel })
+          .eq('email', emailSalvo);
+
+        if (updateError) {
+          console.error("Erro ao atualizar XP no Supabase:", updateError);
+        }
+
+        exibirNotificacao(`+${quantidade} XP Conquistados!`, motivo, '⭐');
+
+        if (novoLevel > levelAtual) {
+          setTimeout(() => {
+            exibirNotificacao(`NÍVEL ALCANÇADO! 🎉`, `Você subiu para o Level ${novoLevel}!`, '🏆', true);
+          }, 600);
+        }
+
+        localStorage.setItem('usuario_xp_atualizado', Date.now());
+
+      } catch (err) {
+        console.error("Erro ao processar adição de XP:", err);
+      }
+    }
+
+    /* ----- PERSISTÊNCIA E SINCRONIZAÇÃO ----- */
+    function salvarLocal() {
+      localStorage.setItem('rendaTotal', rendaTotal.toString());
+      localStorage.setItem('despesas', JSON.stringify(despesas));
+      localStorage.setItem('metas', JSON.stringify(metas));
+    }
+
     async function carregarDados() {
+      rendaTotal = Number(localStorage.getItem('rendaTotal')) || 0;
+      despesas = JSON.parse(localStorage.getItem('despesas')) || [];
+      metas = JSON.parse(localStorage.getItem('metas')) || [];
+      
+      atualizarTela();
+
       try {
         const { data: dadosEntradas } = await _supabase.from('entradas').select('*');
         if (dadosEntradas && dadosEntradas.length > 0) {
@@ -119,7 +380,7 @@
         }
 
         const { data: dadosDespesas } = await _supabase.from('despesas').select('*');
-        if (dadosDespesas) {
+        if (dadosDespesas && dadosDespesas.length > 0) {
           despesas = dadosDespesas.map(d => ({
             id: d.id,
             nome: d.nome,
@@ -129,15 +390,12 @@
         }
 
         const { data: dadosMetas } = await _supabase.from('metas').select('*');
-        if (dadosMetas) {
+        if (dadosMetas && dadosMetas.length > 0) {
           metas = dadosMetas.map(m => {
             const formatarData = (strData) => {
               if (!strData) return '';
               const partes = strData.split('T')[0].split('-');
-              if (partes.length === 3) {
-                return `${partes[2]}/${partes[1]}/${partes[0]}`;
-              }
-              return strData;
+              return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : strData;
             };
 
             return {
@@ -150,28 +408,32 @@
             };
           });
         }
-      } catch (err) {
-        console.error('Erro ao carregar dados:', err);
-      }
 
-      atualizarTela();
+        salvarLocal();
+        atualizarTela();
+      } catch (err) {
+        console.warn('Executando em modo local:', err);
+      }
     }
 
-    async function adicionarRenda() {
-      const val = parseFloat(document.getElementById('valorEntrada').value);
+    async function adicionarRenda(isSomar = true) {
+      const valInput = parseFloat(document.getElementById('valorEntrada').value);
       const nome = document.getElementById('nomeEntrada').value.trim();
 
-      if (!isNaN(val) && val > 0) {
+      if (!isNaN(valInput) && valInput > 0) {
+        const val = isSomar ? valInput : -valInput;
         rendaTotal += val;
         
         document.getElementById('valorEntrada').value = '';
         document.getElementById('nomeEntrada').value = '';
+        
+        salvarLocal();
         atualizarTela();
 
         try {
-          await _supabase.from('entradas').insert([{ nome, valor: val }]);
+          await _supabase.from('entradas').insert([{ nome: nome || (isSomar ? 'Entrada' : 'Saída'), valor: val }]);
         } catch(e) {
-          console.error('Erro ao salvar renda:', e);
+          console.error('Erro ao enviar para o Supabase:', e);
         }
       }
     }
@@ -182,68 +444,119 @@
       const cor = document.getElementById('corDespesa').value;
 
       if (nome && !isNaN(valor) && valor > 0) {
-        const novaDespesa = { id: Date.now(), nome, valor, cor };
-        despesas.push(novaDespesa);
+        const tempId = Date.now();
+        const novaDespesa = { id: tempId, nome, valor, cor };
         
+        despesas.push(novaDespesa);
         document.getElementById('nomeDespesa').value = '';
         document.getElementById('valorDespesa').value = '';
+        
+        salvarLocal();
         atualizarTela();
 
         try {
-          await _supabase.from('despesas').insert([{ nome, valor, cor }]);
+          const { data, error } = await _supabase.from('despesas').insert([{ nome, valor, cor }]).select();
+          if (!error && data && data.length > 0) {
+            novaDespesa.id = data[0].id;
+            salvarLocal();
+          }
         } catch(e) {
-          console.error('Erro ao salvar despesa:', e);
+          console.error('Erro ao enviar para o Supabase:', e);
         }
       }
     }
+
+    window.removerDespesa = async function(id) {
+      despesas = despesas.filter(d => d.id !== id);
+      salvarLocal();
+      atualizarTela();
+
+      try {
+        await _supabase.from('despesas').delete().eq('id', id);
+      } catch(e) {
+        console.error('Erro ao remover do Supabase:', e);
+      }
+    };
 
     async function adicionarMeta() {
       const nome = document.getElementById('metaNome').value.trim();
       const valor = parseFloat(document.getElementById('metaValor').value);
       const inicioInput = document.getElementById('metaInicio').value;
+      let fimInput = document.getElementById('metaFim').value;
 
       if (nome && !isNaN(valor) && valor > 0 && inicioInput) {
-        const [ano, mes, dia] = inicioInput.split('-').map(Number);
-        const dataInicio = new Date(ano, mes - 1, dia);
-
-        const dataFim = new Date(dataInicio);
-        dataFim.setMonth(dataFim.getMonth() + 1);
+        if (!fimInput) {
+          const [ano, mes, dia] = inicioInput.split('-').map(Number);
+          const dataFimCalculada = new Date(ano, mes - 1, dia);
+          dataFimCalculada.setMonth(dataFimCalculada.getMonth() + 1);
+          fimInput = `${dataFimCalculada.getFullYear()}-${String(dataFimCalculada.getMonth() + 1).padStart(2, '0')}-${String(dataFimCalculada.getDate()).padStart(2, '0')}`;
+        }
 
         const valorSemanal = valor / 4;
+        const tempId = Date.now();
 
-        const isoInicio = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-        const isoFim = `${dataFim.getFullYear()}-${String(dataFim.getMonth() + 1).padStart(2, '0')}-${String(dataFim.getDate()).padStart(2, '0')}`;
+        const formatarData = (strData) => {
+          if (!strData) return '';
+          const partes = strData.split('T')[0].split('-');
+          return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : strData;
+        };
 
-        const strInicioExibicao = dataInicio.toLocaleDateString('pt-BR');
-        const strFimExibicao = dataFim.toLocaleDateString('pt-BR');
-
-        metas.push({
-          id: Date.now(),
+        const novaMeta = {
+          id: tempId,
           nome,
           valorTotal: valor,
           valorSemanal,
-          inicio: strInicioExibicao,
-          fim: strFimExibicao
-        });
+          inicio: formatarData(inicioInput),
+          fim: formatarData(fimInput)
+        };
 
+        metas.push(novaMeta);
         document.getElementById('metaNome').value = '';
         document.getElementById('metaValor').value = '';
         document.getElementById('metaInicio').value = '';
+        document.getElementById('metaFim').value = '';
+        
+        salvarLocal();
         atualizarTela();
 
+        // CHECK DA SAÚDE FINANCEIRA: Saldo positivo ao criar a meta dá XP!
+        const totalDespesasAtual = despesas.reduce((acc, d) => acc + d.valor, 0);
+        const saldoAtual = rendaTotal - totalDespesasAtual;
+
+        if (saldoAtual > 0) {
+          await adicionarXP(25, `Meta "${nome}" cadastrada com finanças saudáveis!`);
+        }
+
         try {
-          await _supabase.from('metas').insert([{
+          const { data, error } = await _supabase.from('metas').insert([{
             nome,
             valor_total: valor,
             valor_semanal: valorSemanal,
-            data_inicio: isoInicio,
-            data_fim: isoFim
-          }]);
+            data_inicio: inicioInput,
+            data_fim: fimInput
+          }]).select();
+
+          if (!error && data && data.length > 0) {
+            novaMeta.id = data[0].id;
+            salvarLocal();
+          }
         } catch(e) {
-          console.error('Erro ao salvar meta:', e);
+          console.error('Erro ao salvar meta no Supabase:', e);
         }
       }
     }
+
+    window.removerMeta = async function(id) {
+      metas = metas.filter(m => m.id !== id);
+      salvarLocal();
+      atualizarTela();
+
+      try {
+        await _supabase.from('metas').delete().eq('id', id);
+      } catch(e) {
+        console.error('Erro ao remover do Supabase:', e);
+      }
+    };
 
     function atualizarTela() {
       const totalDespesas = despesas.reduce((acc, d) => acc + d.valor, 0);
@@ -261,12 +574,28 @@
 
       const containerCategorias = document.getElementById('listaCategorias');
       containerCategorias.innerHTML = '';
+      
       despesas.forEach(d => {
-        const perc = totalDespesas > 0 ? ((d.valor / totalDespesas) * 100).toFixed(0) : 0;
+        const percTotalDespesas = totalDespesas > 0 ? ((d.valor / totalDespesas) * 100).toFixed(1) : 0;
+        const percRenda = rendaTotal > 0 ? ((d.valor / rendaTotal) * 100).toFixed(1) : 0;
+
         containerCategorias.innerHTML += `
-          <div class="category-card">
-            <div class="category-header" style="background-color: ${d.cor};">${d.nome}</div>
-            <div class="category-body">${perc}% (${formatarMoeda(d.valor)})</div>
+          <div class="category-card" style="border-top: 4px solid ${d.cor}; flex: 1; min-width: 200px;">
+            <div class="category-header" style="background-color: ${d.cor}22; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <strong>${d.nome}</strong>
+              <button class="btn-delete" onclick="removerDespesa(${d.id})">✖</button>
+            </div>
+            <div class="category-body" style="flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px;">
+              <div style="font-size: 1.2rem; font-weight: bold; color: #2c3e50;">
+                ${formatarMoeda(d.valor)}
+              </div>
+              <div style="font-size: 0.85rem; color: #666;">
+                ➤ <strong>${percTotalDespesas}%</strong> do total de despesas
+              </div>
+              <div style="font-size: 0.85rem; color: #666;">
+                ✩ Compromete <strong>${percRenda}%</strong> da renda
+              </div>
+            </div>
           </div>
         `;
       });
@@ -275,10 +604,13 @@
       containerMetas.innerHTML = '';
       metas.forEach(m => {
         containerMetas.innerHTML += `
-          <div class="goal-card">
-            <div class="goal-name">${m.nome}</div>
-            <div class="goal-weekly">${formatarMoeda(m.valorSemanal)} / semana</div>
-            <div class="goal-dates">${m.inicio} - ${m.fim}</div>
+          <div class="goal-card" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div class="goal-name">${m.nome}</div>
+              <div class="goal-weekly">${formatarMoeda(m.valorSemanal)} / semana</div>
+              <div class="goal-dates">${m.inicio} - ${m.fim}</div>
+            </div>
+            <button class="btn-delete" onclick="removerMeta(${m.id})">✖</button>
           </div>
         `;
       });
